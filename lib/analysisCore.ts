@@ -1,5 +1,5 @@
-import { getPersonality, type PersonalityId } from '../src/personalities'
-import type { AnalysisResult, OpenAIAnalysisPayload } from '../src/types/analysis'
+import { getPersonality, type PersonalityId } from '../src/personalities.js'
+import type { AnalysisResult, OpenAIAnalysisPayload } from '../src/types/analysis.js'
 
 export const VALID_PERSONALITY_IDS: PersonalityId[] = [
   'normal',

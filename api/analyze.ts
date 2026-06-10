@@ -1,7 +1,7 @@
 import {
   callOpenAI,
   isValidPersonalityId,
-} from '../lib/analysisCore'
+} from '../lib/analysisCore.js'
 
 type AnalyzeRequestBody = {
   question?: string
