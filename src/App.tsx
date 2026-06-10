@@ -15,7 +15,16 @@ import type { AnalysisResult } from './types/analysis'
 import { AnimatedNumber } from './components/AnimatedNumber'
 import { FakeRadarChart } from './components/FakeRadarChart'
 import { ShareCard } from './components/ShareCard'
+import { UpgradeModal } from './components/UpgradeModal'
 import { downloadShareImage, generateShareImage } from './utils/shareImage'
+import {
+  consumeUsage,
+  isPersonalityUnlocked,
+  loadUsageSnapshot,
+  setProMode,
+  toggleProMode,
+  type UsageSnapshot,
+} from './usage/planLimits'
 
 type Phase = 'home' | 'loading' | 'result'
 
@@ -36,12 +45,58 @@ export default function App() {
     buildReportExtras('normal'),
   )
   const analysisSessionRef = useRef(0)
+  const [usage, setUsage] = useState<UsageSnapshot>(() => loadUsageSnapshot())
+  const [upgradeOpen, setUpgradeOpen] = useState(false)
+  const [upgradeVariant, setUpgradeVariant] = useState<'limit' | 'personality'>(
+    'limit',
+  )
 
   const personality = getPersonality(personalityId)
+
+  useEffect(() => {
+    setUsage(loadUsageSnapshot())
+  }, [])
+
+  const openUpgrade = (variant: 'limit' | 'personality') => {
+    setUpgradeVariant(variant)
+    setUpgradeOpen(true)
+  }
+
+  const handlePersonalityChange = (id: PersonalityId) => {
+    if (!isPersonalityUnlocked(id, usage.isPro)) {
+      openUpgrade('personality')
+      return
+    }
+    setPersonalityId(id)
+  }
+
+  const handleTogglePro = () => {
+    setUsage(toggleProMode())
+  }
+
+  const handleFakeUpgrade = () => {
+    setUsage(setProMode(true))
+    setUpgradeOpen(false)
+  }
 
   const startAnalysis = () => {
     const trimmed = question.trim()
     if (!trimmed) return
+
+    const snapshot = loadUsageSnapshot()
+    setUsage(snapshot)
+
+    if (!isPersonalityUnlocked(personalityId, snapshot.isPro)) {
+      openUpgrade('personality')
+      return
+    }
+
+    if (snapshot.remaining <= 0) {
+      openUpgrade('limit')
+      return
+    }
+
+    setUsage(consumeUsage())
 
     const session = analysisSessionRef.current + 1
     analysisSessionRef.current = session
@@ -76,6 +131,7 @@ export default function App() {
     setLoadingAnimationDone(false)
     setPendingResult(null)
     setLoadingMessages([])
+    setUsage(loadUsageSnapshot())
   }
 
   useEffect(() => {
@@ -132,13 +188,21 @@ export default function App() {
 
   return (
     <div className={`app-shell theme-${personalityId}`}>
+      <UpgradeModal
+        open={upgradeOpen}
+        variant={upgradeVariant}
+        onClose={() => setUpgradeOpen(false)}
+        onUpgrade={handleFakeUpgrade}
+      />
       {phase === 'home' && (
         <HomeView
           question={question}
           personalityId={personalityId}
+          usage={usage}
           onQuestionChange={setQuestion}
-          onPersonalityChange={setPersonalityId}
+          onPersonalityChange={handlePersonalityChange}
           onStart={startAnalysis}
+          onTogglePro={handleTogglePro}
         />
       )}
       {phase === 'loading' && (
@@ -166,36 +230,58 @@ export default function App() {
 function HomeView({
   question,
   personalityId,
+  usage,
   onQuestionChange,
   onPersonalityChange,
   onStart,
+  onTogglePro,
 }: {
   question: string
   personalityId: PersonalityId
+  usage: UsageSnapshot
   onQuestionChange: (value: string) => void
   onPersonalityChange: (id: PersonalityId) => void
   onStart: () => void
+  onTogglePro: () => void
 }) {
+  const planLabel = usage.isPro ? 'PRO' : 'Free'
+
   return (
     <div className="view fade-in">
       <img className="app-icon" src="/icon.png" alt="AI有點嘴" />
       <h1 className="glow-title">AI 有點嘴</h1>
       <p className="subtitle">已分析 1,234,567 個失敗人生</p>
 
+      <div className="usage-bar">
+        <span className={`usage-plan-badge ${usage.isPro ? 'usage-plan-badge--pro' : ''}`}>
+          {planLabel}
+        </span>
+        <span className="usage-remaining">
+          今日剩餘：<strong>{usage.remaining}</strong> / {usage.dailyLimit}
+        </span>
+      </div>
+
       <div className="personality-section">
         <p className="personality-label">選擇 AI 人格</p>
         <div className="personality-grid">
-          {PERSONALITIES.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className={`personality-chip scale-button ${personalityId === p.id ? 'personality-chip--active' : ''}`}
-              onClick={() => onPersonalityChange(p.id)}
-            >
-              <span className="personality-chip-name">{p.name}</span>
-              <span className="personality-chip-tag">{p.tagline}</span>
-            </button>
-          ))}
+          {PERSONALITIES.map((p) => {
+            const locked = !isPersonalityUnlocked(p.id, usage.isPro)
+            return (
+              <button
+                key={p.id}
+                type="button"
+                className={`personality-chip scale-button ${personalityId === p.id ? 'personality-chip--active' : ''} ${locked ? 'personality-chip--locked' : ''}`}
+                onClick={() => onPersonalityChange(p.id)}
+                aria-disabled={locked}
+              >
+                {locked && <span className="personality-lock-icon" aria-hidden="true">🔒</span>}
+                <span className="personality-chip-name">{p.name}</span>
+                <span className="personality-chip-tag">
+                  {locked ? 'PRO 解鎖' : p.tagline}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -213,6 +299,14 @@ function HomeView({
         disabled={!question.trim()}
       >
         開始量子分析
+      </button>
+
+      <button
+        type="button"
+        className="debug-pro-toggle"
+        onClick={onTogglePro}
+      >
+        切換 PRO 模式（測試）
       </button>
     </div>
   )

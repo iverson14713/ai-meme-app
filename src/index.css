@@ -303,6 +303,227 @@ code {
   line-height: 1.3;
 }
 
+.personality-chip--locked {
+  opacity: 0.55;
+  border-style: dashed;
+  position: relative;
+}
+
+.personality-chip--locked:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+
+.personality-chip--locked.personality-chip--active {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.2);
+}
+
+.personality-lock-icon {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.usage-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--neon-soft);
+  background: rgba(17, 24, 39, 0.65);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 13px;
+}
+
+.usage-plan-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: var(--neon-dim);
+  border: 1px solid var(--neon-soft);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.usage-plan-badge--pro {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(251, 191, 36, 0.12);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+}
+
+.usage-remaining {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.usage-remaining strong {
+  color: var(--neon);
+  font-size: 15px;
+}
+
+.debug-pro-toggle {
+  margin-top: 20px;
+  padding: 8px 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.debug-pro-toggle:hover {
+  color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.upgrade-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.upgrade-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  background: linear-gradient(
+    160deg,
+    rgba(17, 24, 39, 0.98) 0%,
+    rgba(30, 20, 10, 0.95) 100%
+  );
+  box-shadow:
+    0 0 40px rgba(251, 191, 36, 0.15),
+    0 0 80px var(--neon-soft);
+  text-align: center;
+}
+
+.upgrade-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.upgrade-title {
+  font-size: 22px;
+  margin: 0 0 10px;
+  color: #fde68a;
+}
+
+.upgrade-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.upgrade-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  text-align: left;
+}
+
+.upgrade-features li {
+  position: relative;
+  padding: 8px 0 8px 22px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.upgrade-features li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: #fbbf24;
+  font-size: 12px;
+}
+
+.upgrade-pricing {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.upgrade-price-row {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.upgrade-price-label {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 4px;
+}
+
+.upgrade-price-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fde68a;
+}
+
+.upgrade-cta {
+  width: 100%;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #1a1200;
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.45);
+}
+
+.upgrade-fake-note {
+  margin: 10px 0 0;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.upgrade-close {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.upgrade-close:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .neon-button {
   padding: 16px 32px;
   border-radius: 16px;
