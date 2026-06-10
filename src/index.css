@@ -1181,6 +1181,26 @@ code {
   flex-shrink: 0;
 }
 
+.share-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px var(--neon-soft);
+}
+
+.app-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  object-fit: cover;
+  margin-bottom: 16px;
+  box-shadow:
+    0 0 24px var(--neon-soft),
+    0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
 .share-card-logo {
   margin: 0;
   font-size: 22px;

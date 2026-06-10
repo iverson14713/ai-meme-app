@@ -23,7 +23,11 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
         <header className="share-card-header">
           <div className="share-card-logo-row">
-            <span className="share-card-seal">{personality.seal}</span>
+            <img
+              className="share-card-icon"
+              src="/icon.png"
+              alt="AI有點嘴"
+            />
             <div>
               <h2 className="share-card-logo">AI有點嘴</h2>
               <p className="share-card-personality">{personality.name}</p>

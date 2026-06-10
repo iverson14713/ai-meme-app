@@ -178,6 +178,7 @@ function HomeView({
 }) {
   return (
     <div className="view fade-in">
+      <img className="app-icon" src="/icon.png" alt="AI有點嘴" />
       <h1 className="glow-title">AI 有點嘴</h1>
       <p className="subtitle">已分析 1,234,567 個失敗人生</p>
 
