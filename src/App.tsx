@@ -251,80 +251,62 @@ function ResultView({
   onRetry: () => void
   onShare: () => void
 }) {
+  const allStats = [
+    ...report.professionalMetrics.map((m) => ({
+      label: m.label,
+      value: m.value,
+    })),
+    ...result.stats.map((s) => ({ label: s.label, value: s.value })),
+  ]
+
   return (
-    <div className="view fade-in result-view">
-      <article className="report-card card-appear">
-        <header className="report-header">
-          <div className="report-title-row">
-            <span className="report-seal">{personality.seal}</span>
-            <div>
-              <h2 className="report-title">{personality.reportTitle}</h2>
-              <p className="report-meta">
-                {personality.name} · REPORT #{report.reportId} · {report.reportDate}
-              </p>
-            </div>
+    <div className="view fade-in result-view meme-result">
+      <article className="meme-card card-appear">
+        <p className="meme-question">「{question}」</p>
+
+        <section className="verdict-hero card-appear">
+          <div className="verdict-hero-top">
+            <span className="verdict-hero-badge">AI 最終判定</span>
+            <span className={`danger-badge danger-badge--mini danger-${report.dangerLevel.tone}`}>
+              {report.dangerLevel.label}
+            </span>
           </div>
-          <span className={`danger-badge danger-${report.dangerLevel.tone}`}>
-            危險等級：{report.dangerLevel.label}
-          </span>
-        </header>
-
-        <section className="report-section">
-          <p className="report-section-label">分析對象</p>
-          <p className="result-question">「{question}」</p>
-        </section>
-
-        <section className="report-section verdict-section card-appear" style={{ animationDelay: '0.1s' }}>
-          <p className="report-section-label">AI 判定</p>
-          <p className="verdict-text glow-text">「{result.verdict}」</p>
+          <p className="verdict-hero-text glow-text">「{result.verdict}」</p>
+          <p className="verdict-hero-meta">
+            {personality.name} · #{report.reportId.slice(-4)}
+          </p>
         </section>
 
         <FakeRadarChart values={report.radarValues} />
 
-        <section className="report-section pro-section card-appear" style={{ animationDelay: '0.3s' }}>
-          <div className="pro-section-header">
-            <p className="report-section-label">AI 專業分析區</p>
-            <span className="pro-tag">CONFIDENTIAL</span>
-          </div>
-          <div className="pro-metrics">
-            {report.professionalMetrics.map((metric, i) => (
-              <div
-                className="pro-metric-row"
-                key={metric.label}
-                style={{ animationDelay: `${0.35 + i * 0.1}s` }}
-              >
-                <span className="pro-metric-label">{metric.label}</span>
-                <AnimatedNumber value={metric.value} duration={1200 + i * 150} />
+        <section className="stats-compact card-appear" style={{ animationDelay: '0.25s' }}>
+          <div className="stats-compact-grid">
+            {allStats.map((stat, i) => (
+              <div className="stat-compact" key={`${stat.label}-${i}`}>
+                <AnimatedNumber
+                  value={stat.value}
+                  duration={900 + i * 80}
+                />
+                <span className="stat-compact-label">{stat.label}</span>
               </div>
             ))}
           </div>
         </section>
-
-        <section className="report-section category-section card-appear" style={{ animationDelay: '0.45s' }}>
-          <p className="report-section-label">量子分類指標</p>
-          <div className="stats-grid stats-grid--report">
-            {result.stats.map((stat, i) => (
-              <div className="stat-card" key={stat.label}>
-                <AnimatedNumber value={stat.value} duration={1000 + i * 120} />
-                <span className="stat-label">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <footer className="report-disclaimer">
-          {report.disclaimer}
-        </footer>
       </article>
 
-      <div className="result-actions">
-        <button className="neon-button scale-button" onClick={onRetry}>
+      <div className="result-actions result-actions--meme">
+        <button
+          className="share-button-primary scale-button"
+          onClick={onShare}
+        >
+          分享這句嘴炮
+        </button>
+        <button className="retry-button-subtle scale-button" onClick={onRetry}>
           再問一次
         </button>
-        <button className="outline-button scale-button" onClick={onShare}>
-          分享
-        </button>
       </div>
+
+      <p className="meme-disclaimer">{report.disclaimer}</p>
     </div>
   )
 }
