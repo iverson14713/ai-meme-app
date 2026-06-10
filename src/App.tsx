@@ -18,15 +18,17 @@ import { ShareCard } from './components/ShareCard'
 import { RareCrashView } from './components/RareCrashView'
 import { RareEventLoadingView } from './components/RareEventLoadingView'
 import { RareEventResultView } from './components/RareEventResultView'
+import { TruthEventLoadingView } from './components/TruthEventLoadingView'
 import { UpgradeModal } from './components/UpgradeModal'
 import {
   buildCommonRareResult,
+  buildTruthRareResult,
   buildUltraRareResult,
   forceRareEvent,
-  RARE_LOADING_MS,
+  getRareLoadingMs,
   rollRareEvent,
 } from './rareEvents/rareEvents'
-import type { ActiveRareEvent } from './rareEvents/types'
+import type { ActiveRareEvent, DebugForceRareTier } from './rareEvents/types'
 import { downloadShareImage, generateShareImage } from './utils/shareImage'
 import {
   consumeUsage,
@@ -69,7 +71,7 @@ export default function App() {
   )
   const [activeRare, setActiveRare] = useState<ActiveRareEvent | null>(null)
   const [rareProgress, setRareProgress] = useState(0)
-  const [debugForceRare, setDebugForceRare] = useState<'common' | 'ultra' | null>(
+  const [debugForceRare, setDebugForceRare] = useState<DebugForceRareTier | null>(
     null,
   )
 
@@ -101,7 +103,7 @@ export default function App() {
     setUpgradeOpen(false)
   }
 
-  const handleArmRare = (tier: 'common' | 'ultra') => {
+  const handleArmRare = (tier: DebugForceRareTier) => {
     setDebugForceRare((prev) => (prev === tier ? null : tier))
   }
 
@@ -234,12 +236,17 @@ export default function App() {
   }, [phase, loadingMessages])
 
   useEffect(() => {
-    if (phase !== 'rare-loading' || !activeRare || activeRare.tier !== 'common') {
+    if (
+      phase !== 'rare-loading' ||
+      !activeRare ||
+      activeRare.tier === 'ultra'
+    ) {
       return
     }
 
+    const loadingMs = getRareLoadingMs(activeRare.tier)
     const tickMs = 50
-    const steps = RARE_LOADING_MS / tickMs
+    const steps = loadingMs / tickMs
     let step = 0
 
     const progressTimer = window.setInterval(() => {
@@ -250,9 +257,13 @@ export default function App() {
     const completeTimer = window.setTimeout(() => {
       window.clearInterval(progressTimer)
       setRareProgress(99)
-      setResult(buildCommonRareResult(activeRare.event))
+      setResult(
+        activeRare.tier === 'truth'
+          ? buildTruthRareResult(activeRare.event)
+          : buildCommonRareResult(activeRare.event),
+      )
       setPhase('rare-result')
-    }, RARE_LOADING_MS)
+    }, loadingMs)
 
     return () => {
       window.clearInterval(progressTimer)
@@ -276,7 +287,9 @@ export default function App() {
   const shellClass =
     phase === 'rare-crash'
       ? 'app-shell theme-rare-crash'
-      : `app-shell theme-${personalityId}`
+      : phase === 'rare-loading' && activeRare?.tier === 'truth'
+        ? 'app-shell theme-truth'
+        : `app-shell theme-${personalityId}`
 
   return (
     <div className={shellClass}>
@@ -310,6 +323,9 @@ export default function App() {
       )}
       {phase === 'rare-loading' && activeRare?.tier === 'common' && (
         <RareEventLoadingView event={activeRare.event} progress={rareProgress} />
+      )}
+      {phase === 'rare-loading' && activeRare?.tier === 'truth' && (
+        <TruthEventLoadingView event={activeRare.event} progress={rareProgress} />
       )}
       {phase === 'rare-crash' && (
         <RareCrashView onComplete={handleRareCrashComplete} />
@@ -355,8 +371,8 @@ function HomeView({
   onPersonalityChange: (id: PersonalityId) => void
   onStart: () => void
   onTogglePro: () => void
-  debugForceRare: 'common' | 'ultra' | null
-  onArmRare: (tier: 'common' | 'ultra') => void
+  debugForceRare: DebugForceRareTier | null
+  onArmRare: (tier: DebugForceRareTier) => void
 }) {
   const planLabel = usage.isPro ? 'PRO' : 'Free'
 
@@ -434,10 +450,21 @@ function HomeView({
         >
           {debugForceRare === 'ultra' ? '✓ 下次：強制 AI 崩潰' : '強制 AI 崩潰'}
         </button>
+        <button
+          type="button"
+          className={`debug-pro-toggle ${debugForceRare === 'truth' ? 'debug-pro-toggle--active' : ''}`}
+          onClick={() => onArmRare('truth')}
+        >
+          {debugForceRare === 'truth' ? '✓ 下次：強制超真實' : '強制超真實事件'}
+        </button>
         {debugForceRare && (
           <p className="debug-armed-hint">
             已武裝：下次「開始量子分析」將觸發
-            {debugForceRare === 'ultra' ? ' AI 崩潰' : ' 稀有事件'}
+            {debugForceRare === 'ultra'
+              ? ' AI 崩潰'
+              : debugForceRare === 'truth'
+                ? ' 超真實暴擊'
+                : ' 稀有事件'}
           </p>
         )}
       </div>

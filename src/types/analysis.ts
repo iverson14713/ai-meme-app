@@ -8,7 +8,7 @@ export type AnalysisResult = {
   finalVerdict: string
   stats: [StatItem, StatItem, StatItem]
   source: 'openai' | 'fallback' | 'rare'
-  rareTier?: 'common' | 'ultra'
+  rareTier?: 'common' | 'ultra' | 'truth'
   rareEventId?: string
 }
 

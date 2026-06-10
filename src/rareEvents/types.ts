@@ -9,9 +9,19 @@ export type CommonRareEventId =
   | 'doubt'
   | 'openai-ghost'
   | 'huh'
+  | 'glitch'
+  | 'give-up'
+  | 'no-work'
+  | 'emotional-op'
 
-export type CommonRareEvent = {
-  id: CommonRareEventId
+export type TruthRareEventId =
+  | 'already-know'
+  | 'not-dare'
+  | 'want-decide'
+  | 'fear-regret'
+  | 'not-let-go'
+
+export type RareEventBase = {
   badge: string
   title: string
   loadingLines: string[]
@@ -21,6 +31,17 @@ export type CommonRareEvent = {
   footer: string
 }
 
+export type CommonRareEvent = RareEventBase & {
+  id: CommonRareEventId
+}
+
+export type TruthRareEvent = RareEventBase & {
+  id: TruthRareEventId
+}
+
 export type ActiveRareEvent =
   | { tier: 'common'; event: CommonRareEvent }
   | { tier: 'ultra' }
+  | { tier: 'truth'; event: TruthRareEvent }
+
+export type DebugForceRareTier = 'common' | 'ultra' | 'truth'

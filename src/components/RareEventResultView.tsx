@@ -16,6 +16,48 @@ type RareEventResultViewProps = {
   onRetry: () => void
 }
 
+function getRareMeta(activeRare: ActiveRareEvent) {
+  if (activeRare.tier === 'ultra') {
+    return {
+      badge: 'ULTRA RARE // AI CRASH',
+      shareVariant: 'ultra' as const,
+      sectionLabel: '⚠ 系統崩潰報告 · 超稀有',
+      verdictBadge: 'AI 崩潰判定',
+      dangerLabel: '系統放棄',
+      viewClass: 'rare-result-view--ultra',
+      cardClass: 'rare-meme-card--ultra',
+      metaSuffix: '超稀有崩潰',
+      showStats: true,
+    }
+  }
+
+  if (activeRare.tier === 'truth') {
+    return {
+      badge: activeRare.event.badge,
+      shareVariant: 'truth' as const,
+      sectionLabel: '◌ 超真實暴擊 · 限時截圖',
+      verdictBadge: '超真實判定',
+      dangerLabel: '一秒認真',
+      viewClass: 'rare-result-view--truth',
+      cardClass: 'rare-meme-card--truth',
+      metaSuffix: '超真實事件',
+      showStats: false,
+    }
+  }
+
+  return {
+    badge: activeRare.event.badge,
+    shareVariant: 'rare' as const,
+    sectionLabel: '✦ 稀有事件 · 限時截圖',
+    verdictBadge: '稀有事件判定',
+    dangerLabel: '非正常輸出',
+    viewClass: 'rare-result-view--common',
+    cardClass: '',
+    metaSuffix: '稀有事件',
+    showStats: true,
+  }
+}
+
 export function RareEventResultView({
   question,
   result,
@@ -29,9 +71,7 @@ export function RareEventResultView({
   const [isGenerating, setIsGenerating] = useState(false)
   const [shareError, setShareError] = useState('')
 
-  const isUltra = activeRare.tier === 'ultra'
-  const rareBadge =
-    activeRare.tier === 'common' ? activeRare.event.badge : 'ULTRA RARE // AI CRASH'
+  const meta = getRareMeta(activeRare)
 
   const handleGenerateShare = async () => {
     if (!shareCardRef.current) return
@@ -54,13 +94,11 @@ export function RareEventResultView({
 
   return (
     <div
-      className={`view fade-in result-view meme-result rare-result-view ${isUltra ? 'rare-result-view--ultra' : 'rare-result-view--common'}`}
+      className={`view fade-in result-view meme-result rare-result-view ${meta.viewClass}`}
     >
       <div className="rare-result-glow" aria-hidden="true" />
 
-      <p className="share-section-label">
-        {isUltra ? '⚠ 系統崩潰報告 · 超稀有' : '✦ 稀有事件 · 限時截圖'}
-      </p>
+      <p className="share-section-label">{meta.sectionLabel}</p>
 
       <div className="share-card-preview-wrap">
         <ShareCard
@@ -68,8 +106,8 @@ export function RareEventResultView({
           result={result}
           report={report}
           personality={personality}
-          variant={isUltra ? 'ultra' : 'rare'}
-          rareBadge={rareBadge}
+          variant={meta.shareVariant}
+          rareBadge={meta.badge}
         />
       </div>
 
@@ -101,45 +139,50 @@ export function RareEventResultView({
         </button>
       </div>
 
-      <article className={`meme-card card-appear rare-meme-card ${isUltra ? 'rare-meme-card--ultra' : ''}`}>
-        <span className="rare-event-result-badge">{rareBadge}</span>
+      <article className={`meme-card card-appear rare-meme-card ${meta.cardClass}`}>
+        <span className="rare-event-result-badge">{meta.badge}</span>
         <p className="meme-question rare-meme-question">「{question}」</p>
 
-        <ul className="analysis-lines card-appear rare-analysis-lines">
-          {result.analysis.map((line, i) => (
-            <li key={`${line}-${i}`} style={{ animationDelay: `${0.08 * i}s` }}>
-              {line}
-            </li>
-          ))}
-        </ul>
+        {activeRare.tier !== 'truth' && (
+          <ul className="analysis-lines card-appear rare-analysis-lines">
+            {result.analysis.map((line, i) => (
+              <li key={`${line}-${i}`} style={{ animationDelay: `${0.08 * i}s` }}>
+                {line}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <section className="verdict-hero card-appear rare-verdict-hero">
           <div className="verdict-hero-top">
-            <span className="verdict-hero-badge">
-              {isUltra ? 'AI 崩潰判定' : '稀有事件判定'}
-            </span>
+            <span className="verdict-hero-badge">{meta.verdictBadge}</span>
             <span className="danger-badge danger-badge--mini danger-giveup">
-              {isUltra ? '系統放棄' : '非正常輸出'}
+              {meta.dangerLabel}
             </span>
           </div>
           <p className="verdict-hero-text glow-text rare-verdict-text">
             「{result.finalVerdict}」
           </p>
+          {activeRare.tier === 'truth' && (
+            <p className="truth-result-whisper">{result.analysis[1]}</p>
+          )}
           <p className="verdict-hero-meta">
-            {personality.name} · #{report.reportId.slice(-4)} · 稀有事件
+            {personality.name} · #{report.reportId.slice(-4)} · {meta.metaSuffix}
           </p>
         </section>
 
-        <section className="stats-compact card-appear" style={{ animationDelay: '0.25s' }}>
-          <div className="stats-compact-grid stats-compact-grid--three">
-            {result.stats.map((stat, i) => (
-              <div className="stat-compact rare-stat-compact" key={`${stat.label}-${i}`}>
-                <AnimatedNumber value={stat.value} duration={900 + i * 80} />
-                <span className="stat-compact-label">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
+        {meta.showStats && (
+          <section className="stats-compact card-appear" style={{ animationDelay: '0.25s' }}>
+            <div className="stats-compact-grid stats-compact-grid--three">
+              {result.stats.map((stat, i) => (
+                <div className="stat-compact rare-stat-compact" key={`${stat.label}-${i}`}>
+                  <AnimatedNumber value={stat.value} duration={900 + i * 80} />
+                  <span className="stat-compact-label">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </article>
     </div>
   )
