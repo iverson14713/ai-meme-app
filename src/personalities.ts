@@ -1,6 +1,7 @@
 export type PersonalityId =
   | 'normal'
   | 'hell'
+  | 'hellspicy'
   | 'salaryman'
   | 'lovebrain'
   | 'zen'
@@ -40,6 +41,17 @@ export const PERSONALITIES: Personality[] = [
     loadingFooter: '警告：本分析可能讓你當場清醒。',
     reportTitle: '地獄 AI 殘忍報告',
     seal: '🔥',
+  },
+  {
+    id: 'hellspicy',
+    name: '地獄加辣',
+    tagline: '更毒一點，但仍是你朋友',
+    loadingBadge: 'INFERNO SPICY v999',
+    loadingTitle: '地獄加辣分析中',
+    holdMessage: 'AI 看完你的問題，決定先深呼吸...',
+    loadingFooter: '辣度偏高，請自行準備衛生紙（擦笑淚）。',
+    reportTitle: '地獄加辣 殘酷報告',
+    seal: '🌶️',
   },
   {
     id: 'salaryman',
@@ -116,6 +128,20 @@ export const PERSONALITY_LOADING_MESSAGES: Record<PersonalityId, string[]> = {
     '分析進度：70% 清醒，30% 不願面對...',
     'AI 正在整理你的社死預告清單...',
   ],
+  hellspicy: [
+    '正在載入加辣版毒舌模組...',
+    'AI 偵測到你又想找人背鍋...',
+    '正在掃描你的爛決定自療指數...',
+    '偵測到經典「我不是困惑，我是想被同意」...',
+    'AI 看完你的問題，決定先深呼吸...',
+    '正在比對你的藉口與現實落差...',
+    '載入中：逃避現實雷達 v2.0...',
+    '偵測到高濃度自我催眠訊號...',
+    'AI 確認：這不是人生難題，是又想逃...',
+    '正在模擬你事後心裡的 OS...',
+    '分析進度：90% 看破，10% 替你留面子...',
+    'AI 正在整理你的社死 plus 預告...',
+  ],
   salaryman: [
     '正在同步你的出勤焦慮...',
     '偵測到「不想上班但想領薪水」矛盾...',
@@ -186,6 +212,12 @@ export const PERSONALITY_DISCLAIMERS: Record<PersonalityId, string[]> = {
     'AI 嘴硬心軟，罵完記得照顧自己。',
     '如果看哭了，建議先喝杯水。',
     '地獄模式：只燙嘴，不傷人。',
+  ],
+  hellspicy: [
+    '地獄加辣：更狠但仍是你朋友，看完記得喝水。',
+    '本報告辣度偏高，不建議轉發給主管。',
+    '如果被戳到，代表 AI 可能說對了。',
+    '加辣不加恨，嘴完還是會擔心你。',
   ],
   salaryman: [
     '本報告不能當離職證明使用。',

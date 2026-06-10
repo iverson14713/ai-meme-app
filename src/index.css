@@ -146,6 +146,16 @@ code {
   --shell-bg: #0a0608;
 }
 
+.theme-hellspicy {
+  --neon: #ff4444;
+  --neon-dim: rgba(255, 68, 68, 0.7);
+  --neon-soft: rgba(255, 68, 68, 0.32);
+  --neon-glow: rgba(255, 100, 50, 0.55);
+  --neon-bg: rgba(255, 68, 68, 0.12);
+  --neon-dark: #ff3300;
+  --shell-bg: #0a0404;
+}
+
 .theme-salaryman {
   --neon: #7eb8ff;
   --neon-dim: rgba(126, 184, 255, 0.65);
