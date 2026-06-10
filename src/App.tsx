@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   LOADING_HOLD_MS,
   LOADING_MESSAGE_INTERVAL_MS,
@@ -15,7 +15,17 @@ import type { AnalysisResult } from './types/analysis'
 import { AnimatedNumber } from './components/AnimatedNumber'
 import { FakeRadarChart } from './components/FakeRadarChart'
 import { ShareCard } from './components/ShareCard'
+import { RareCrashView } from './components/RareCrashView'
+import { RareEventLoadingView } from './components/RareEventLoadingView'
+import { RareEventResultView } from './components/RareEventResultView'
 import { UpgradeModal } from './components/UpgradeModal'
+import {
+  buildCommonRareResult,
+  buildUltraRareResult,
+  RARE_LOADING_MS,
+  rollRareEvent,
+} from './rareEvents/rareEvents'
+import type { ActiveRareEvent } from './rareEvents/types'
 import { downloadShareImage, generateShareImage } from './utils/shareImage'
 import {
   consumeUsage,
@@ -26,7 +36,13 @@ import {
   type UsageSnapshot,
 } from './usage/planLimits'
 
-type Phase = 'home' | 'loading' | 'result'
+type Phase =
+  | 'home'
+  | 'loading'
+  | 'result'
+  | 'rare-loading'
+  | 'rare-crash'
+  | 'rare-result'
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('home')
@@ -50,6 +66,8 @@ export default function App() {
   const [upgradeVariant, setUpgradeVariant] = useState<'limit' | 'personality'>(
     'limit',
   )
+  const [activeRare, setActiveRare] = useState<ActiveRareEvent | null>(null)
+  const [rareProgress, setRareProgress] = useState(0)
 
   const personality = getPersonality(personalityId)
 
@@ -98,6 +116,21 @@ export default function App() {
 
     setUsage(consumeUsage())
 
+    const rareRoll = rollRareEvent()
+    if (rareRoll) {
+      setActiveRare(rareRoll)
+      setReport(buildReportExtras(personalityId))
+      setRareProgress(0)
+      setPendingResult(null)
+
+      if (rareRoll.tier === 'ultra') {
+        setPhase('rare-crash')
+      } else {
+        setPhase('rare-loading')
+      }
+      return
+    }
+
     const session = analysisSessionRef.current + 1
     analysisSessionRef.current = session
 
@@ -106,6 +139,7 @@ export default function App() {
     setIsLoadingHold(false)
     setLoadingAnimationDone(false)
     setPendingResult(null)
+    setActiveRare(null)
     setLoadingMessages(
       pickLoadingMessages(
         personalityId,
@@ -122,6 +156,11 @@ export default function App() {
     })
   }
 
+  const handleRareCrashComplete = useCallback(() => {
+    setResult(buildUltraRareResult())
+    setPhase('rare-result')
+  }, [])
+
   const resetToHome = () => {
     analysisSessionRef.current += 1
     setPhase('home')
@@ -131,6 +170,8 @@ export default function App() {
     setLoadingAnimationDone(false)
     setPendingResult(null)
     setLoadingMessages([])
+    setActiveRare(null)
+    setRareProgress(0)
     setUsage(loadUsageSnapshot())
   }
 
@@ -174,6 +215,33 @@ export default function App() {
   }, [phase, loadingMessages])
 
   useEffect(() => {
+    if (phase !== 'rare-loading' || !activeRare || activeRare.tier !== 'common') {
+      return
+    }
+
+    const tickMs = 50
+    const steps = RARE_LOADING_MS / tickMs
+    let step = 0
+
+    const progressTimer = window.setInterval(() => {
+      step += 1
+      setRareProgress(Math.min(99, Math.round((step / steps) * 99)))
+    }, tickMs)
+
+    const completeTimer = window.setTimeout(() => {
+      window.clearInterval(progressTimer)
+      setRareProgress(99)
+      setResult(buildCommonRareResult(activeRare.event))
+      setPhase('rare-result')
+    }, RARE_LOADING_MS)
+
+    return () => {
+      window.clearInterval(progressTimer)
+      window.clearTimeout(completeTimer)
+    }
+  }, [phase, activeRare])
+
+  useEffect(() => {
     if (phase !== 'loading' || !loadingAnimationDone || !pendingResult) return
     setResult(pendingResult)
     setPhase('result')
@@ -186,8 +254,13 @@ export default function App() {
       ? personality.holdMessage
       : (loadingMessages[messageIndex] ?? loadingMessages[0] ?? '')
 
+  const shellClass =
+    phase === 'rare-crash'
+      ? 'app-shell theme-rare-crash'
+      : `app-shell theme-${personalityId}`
+
   return (
-    <div className={`app-shell theme-${personalityId}`}>
+    <div className={shellClass}>
       <UpgradeModal
         open={upgradeOpen}
         variant={upgradeVariant}
@@ -212,6 +285,22 @@ export default function App() {
           message={loadingMessage}
           messageKey={waitingForApi ? 'api-wait' : isLoadingHold ? 'hold' : messageIndex}
           isHold={isLoadingHold || waitingForApi}
+        />
+      )}
+      {phase === 'rare-loading' && activeRare?.tier === 'common' && (
+        <RareEventLoadingView event={activeRare.event} progress={rareProgress} />
+      )}
+      {phase === 'rare-crash' && (
+        <RareCrashView onComplete={handleRareCrashComplete} />
+      )}
+      {phase === 'rare-result' && activeRare && (
+        <RareEventResultView
+          question={question}
+          result={result}
+          report={report}
+          personality={personality}
+          activeRare={activeRare}
+          onRetry={resetToHome}
         />
       )}
       {phase === 'result' && (

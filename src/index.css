@@ -196,6 +196,16 @@ code {
   --shell-bg: #0a0805;
 }
 
+.theme-rare-crash {
+  --neon: #ff3333;
+  --neon-dim: rgba(255, 51, 51, 0.75);
+  --neon-soft: rgba(255, 51, 51, 0.35);
+  --neon-glow: rgba(255, 80, 80, 0.55);
+  --neon-bg: rgba(255, 51, 51, 0.12);
+  --neon-dark: #cc2222;
+  --shell-bg: #0a0000;
+}
+
 .view {
   display: flex;
   flex-direction: column;
@@ -1656,4 +1666,448 @@ code {
 
 .result-details .meme-card {
   margin-top: 8px;
+}
+
+/* ── Rare Events ── */
+
+.rare-loading-view {
+  position: relative;
+}
+
+.rare-event-shimmer {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    color-mix(in srgb, var(--neon) 8%, transparent),
+    transparent
+  );
+  animation: rare-shimmer 4s linear infinite;
+}
+
+@keyframes rare-shimmer {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rare-event-badge {
+  color: #fbbf24 !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  background: rgba(251, 191, 36, 0.1) !important;
+  animation: rare-badge-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rare-badge-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
+  }
+}
+
+.rare-event-title {
+  color: #fde68a !important;
+  text-shadow:
+    0 0 10px rgba(251, 191, 36, 0.5),
+    0 0 30px rgba(251, 191, 36, 0.25) !important;
+}
+
+.rare-event-message {
+  color: #fde68a;
+}
+
+.rare-progress-track {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.rare-progress-fill {
+  background: linear-gradient(90deg, #f59e0b, #fde68a) !important;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+}
+
+.rare-progress-label {
+  color: #fde68a !important;
+}
+
+.rare-loading-footer {
+  color: rgba(251, 191, 36, 0.45);
+}
+
+/* Ultra crash sequence */
+
+.rare-crash-view {
+  position: relative;
+  min-height: 60vh;
+  justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.rare-crash-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 0, 0, 0.04) 2px,
+    rgba(255, 0, 0, 0.04) 4px
+  );
+  z-index: 2;
+}
+
+.rare-crash-noise {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: rare-noise 0.15s steps(2) infinite;
+  z-index: 1;
+}
+
+@keyframes rare-noise {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-5%, -5%);
+  }
+}
+
+.rare-crash-shake {
+  animation: rare-shake 0.12s linear infinite;
+}
+
+@keyframes rare-shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-3px, 2px);
+  }
+  50% {
+    transform: translate(3px, -2px);
+  }
+  75% {
+    transform: translate(-2px, -3px);
+  }
+  100% {
+    transform: translate(2px, 1px);
+  }
+}
+
+.rare-crash-boot {
+  text-align: center;
+  z-index: 3;
+}
+
+.rare-crash-boot-text {
+  font-family: ui-monospace, Consolas, monospace;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 20px 0;
+}
+
+.rare-crash-boot-bar {
+  width: 200px;
+  height: 4px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rare-crash-boot-fill {
+  height: 100%;
+  width: 0;
+  background: var(--neon);
+  animation: rare-boot-fill 1.2s ease-out forwards;
+}
+
+@keyframes rare-boot-fill {
+  to {
+    width: 72%;
+  }
+}
+
+.rare-crash-chaos {
+  width: 100%;
+  max-width: 380px;
+  z-index: 3;
+  text-align: left;
+}
+
+.rare-crash-warning-bar {
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  background: rgba(255, 0, 0, 0.15);
+  border: 1px solid rgba(255, 50, 50, 0.6);
+  color: #ff4444;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  animation: rare-warning-flash 0.4s step-end infinite;
+  text-align: center;
+}
+
+@keyframes rare-warning-flash {
+  0%,
+  100% {
+    opacity: 1;
+    background: rgba(255, 0, 0, 0.2);
+  }
+  50% {
+    opacity: 0.7;
+    background: rgba(255, 0, 0, 0.08);
+  }
+}
+
+.rare-crash-glitch-wrap {
+  position: relative;
+  margin: 24px 0;
+  min-height: 48px;
+}
+
+.rare-crash-glitch-text {
+  font-size: clamp(22px, 6vw, 32px);
+  font-weight: bold;
+  font-family: ui-monospace, Consolas, monospace;
+  color: #ff3333;
+  text-shadow:
+    2px 0 #00ffff,
+    -2px 0 #ff00ff;
+  animation: rare-glitch-text 0.2s steps(2) infinite;
+  margin: 0;
+  text-align: center;
+}
+
+.rare-crash-glitch-text--offset {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  transform: translate(2px, -1px);
+}
+
+@keyframes rare-glitch-text {
+  0% {
+    clip-path: inset(20% 0 60% 0);
+  }
+  50% {
+    clip-path: inset(60% 0 10% 0);
+  }
+  100% {
+    clip-path: inset(10% 0 40% 0);
+  }
+}
+
+.rare-crash-alert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: 2px solid #ff3333;
+  background: rgba(255, 0, 0, 0.1);
+  box-shadow: 0 0 24px rgba(255, 0, 0, 0.3);
+}
+
+.rare-crash-alert-icon {
+  font-size: 24px;
+  animation: rare-warning-flash 0.5s step-end infinite;
+}
+
+.rare-crash-alert-label {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4444;
+  letter-spacing: 0.15em;
+}
+
+.rare-crash-alert-code {
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  color: rgba(255, 100, 100, 0.7);
+}
+
+.rare-crash-log {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: rgba(255, 100, 100, 0.75);
+  line-height: 1.7;
+  padding: 12px;
+  border-left: 2px solid rgba(255, 50, 50, 0.5);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.rare-crash-log p {
+  margin: 4px 0;
+}
+
+.rare-crash-log-corrupt {
+  color: #ff6666;
+  animation: rare-glitch-text 0.3s steps(3) infinite;
+}
+
+.rare-crash-final {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: rgba(5, 0, 0, 0.85);
+  padding: 24px;
+  text-align: center;
+}
+
+.rare-ultra-badge {
+  padding: 4px 14px;
+  margin-bottom: 20px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.5);
+  background: rgba(255, 0, 0, 0.12);
+  animation: rare-badge-pulse 1s ease-in-out infinite;
+}
+
+.rare-crash-final-text {
+  font-size: clamp(22px, 6vw, 28px) !important;
+  color: #ff6666 !important;
+  text-shadow:
+    0 0 16px rgba(255, 0, 0, 0.6),
+    0 0 40px rgba(255, 0, 0, 0.3) !important;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.rare-crash-final-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+/* Rare result */
+
+.rare-result-view {
+  position: relative;
+  max-width: 420px;
+}
+
+.rare-result-glow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(251, 191, 36, 0.12) 0%,
+    transparent 70%
+  );
+}
+
+.rare-result-view--ultra .rare-result-glow {
+  background: radial-gradient(
+    circle,
+    rgba(255, 50, 50, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+.rare-meme-card {
+  position: relative;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.12);
+}
+
+.rare-meme-card--ultra {
+  border-color: rgba(255, 68, 68, 0.45) !important;
+  box-shadow: 0 0 28px rgba(255, 0, 0, 0.15);
+}
+
+.rare-event-result-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.08);
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.rare-meme-card--ultra .rare-event-result-badge {
+  color: #ff6666;
+  border-color: rgba(255, 68, 68, 0.45);
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.rare-verdict-hero {
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+.rare-result-view--ultra .rare-verdict-text {
+  color: #ff7777 !important;
+  text-shadow: 0 0 14px rgba(255, 0, 0, 0.4) !important;
+}
+
+.rare-share-button {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;
+  color: #1a1200 !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35) !important;
+}
+
+.rare-result-view--ultra .rare-share-button {
+  background: linear-gradient(135deg, #cc2222, #ff4444) !important;
+  color: white !important;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.35) !important;
+}
+
+.share-card-export--rare {
+  border-color: rgba(251, 191, 36, 0.55) !important;
+  box-shadow: inset 0 0 40px rgba(251, 191, 36, 0.06);
+}
+
+.share-card-export--ultra {
+  border-color: rgba(255, 68, 68, 0.6) !important;
+  box-shadow:
+    inset 0 0 40px rgba(255, 0, 0, 0.08),
+    0 0 20px rgba(255, 0, 0, 0.2);
+}
+
+.share-card-rare-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-size: 72px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: rgba(251, 191, 36, 0.08);
+  pointer-events: none;
+  z-index: 0;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.share-card-export--ultra .share-card-rare-stamp {
+  color: rgba(255, 50, 50, 0.1);
+  font-size: 64px;
 }

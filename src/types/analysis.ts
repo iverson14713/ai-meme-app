@@ -7,7 +7,9 @@ export type AnalysisResult = {
   analysis: [string, string, string]
   finalVerdict: string
   stats: [StatItem, StatItem, StatItem]
-  source: 'openai' | 'fallback'
+  source: 'openai' | 'fallback' | 'rare'
+  rareTier?: 'common' | 'ultra'
+  rareEventId?: string
 }
 
 export type OpenAIAnalysisPayload = {

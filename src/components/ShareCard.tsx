@@ -8,18 +8,35 @@ type ShareCardProps = {
   result: AnalysisResult
   report: ReportExtras
   personality: Personality
+  variant?: 'normal' | 'rare' | 'ultra'
+  rareBadge?: string
 }
 
 export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
-  function ShareCard({ result, report, personality }, ref) {
+  function ShareCard(
+    { result, report, personality, variant = 'normal', rareBadge },
+    ref,
+  ) {
     const siteLabel =
       typeof window !== 'undefined' && window.location.host
         ? window.location.host
         : 'AI有點嘴'
 
+    const cardClass =
+      variant === 'ultra'
+        ? 'share-card-export share-card-export--ultra'
+        : variant === 'rare'
+          ? 'share-card-export share-card-export--rare'
+          : 'share-card-export'
+
     return (
-      <div ref={ref} className="share-card-export">
+      <div ref={ref} className={cardClass}>
         <div className="share-card-scanlines" aria-hidden="true" />
+        {variant !== 'normal' && (
+          <div className="share-card-rare-stamp" aria-hidden="true">
+            {variant === 'ultra' ? 'CRASH' : 'RARE'}
+          </div>
+        )}
 
         <header className="share-card-header">
           <div className="share-card-logo-row">
@@ -33,7 +50,9 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               <p className="share-card-personality">{personality.name}</p>
             </div>
           </div>
-          <span className="share-card-badge">OFFICIAL AI REPORT</span>
+          <span className="share-card-badge">
+            {rareBadge ?? 'OFFICIAL AI REPORT'}
+          </span>
         </header>
 
         <main className="share-card-main">
