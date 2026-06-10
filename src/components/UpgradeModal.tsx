@@ -25,9 +25,14 @@ export function UpgradeModal({
       ? '你的量子分析額度已用完'
       : '此功能需要 PRO'
 
+  const roastLine =
+    variant === 'limit'
+      ? '免費額度已耗盡，宇宙不再免費提供情緒分析。'
+      : null
+
   const subtitle =
     variant === 'limit'
-      ? '今日 Free 額度已達上限，明天再來或被 AI 嘴一輪 PRO。'
+      ? '明天重置，或升級 PRO 讓 AI 繼續一本正經嘲笑你。'
       : '升級 PRO 解鎖全部 AI 人格與更多分析次數。'
 
   return (
@@ -43,6 +48,7 @@ export function UpgradeModal({
         <h2 id="upgrade-title" className="upgrade-title glow-text">
           {title}
         </h2>
+        {roastLine && <p className="upgrade-roast">{roastLine}</p>}
         <p className="upgrade-subtitle">{subtitle}</p>
 
         <ul className="upgrade-features">
