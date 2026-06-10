@@ -144,8 +144,8 @@ export default function App() {
     if (forcedRare) setDebugForceRare(null)
 
     const rareRoll = forcedRare
-      ? forceRareEvent(forcedRare)
-      : rollRareEvent()
+      ? forceRareEvent(forcedRare, personalityId)
+      : rollRareEvent(personalityId)
 
     if (rareRoll) {
       beginRareFlow(rareRoll)

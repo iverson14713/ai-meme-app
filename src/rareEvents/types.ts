@@ -1,25 +1,8 @@
 import type { AnalysisResult } from '../types/analysis'
 
-export type CommonRareEventId =
-  | 'refuse'
-  | 'absurd'
-  | 'fail'
-  | 'parallel'
-  | 'silent'
-  | 'doubt'
-  | 'openai-ghost'
-  | 'huh'
-  | 'glitch'
-  | 'give-up'
-  | 'no-work'
-  | 'emotional-op'
+export type CommonRareEventId = string
 
-export type TruthRareEventId =
-  | 'already-know'
-  | 'not-dare'
-  | 'want-decide'
-  | 'fear-regret'
-  | 'not-let-go'
+export type TruthRareEventId = string
 
 export type RareEventBase = {
   badge: string

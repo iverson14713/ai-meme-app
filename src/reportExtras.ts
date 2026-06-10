@@ -1,5 +1,5 @@
-import type { PersonalityId } from './personalities'
-import { PERSONALITY_DISCLAIMERS } from './personalities'
+import type { PersonalityId } from './personalities/types.js'
+import { pickDisclaimer as pickPersonalityDisclaimer } from './personalities/index.js'
 
 export type ProfessionalMetric = {
   label: string
@@ -36,11 +36,6 @@ const DANGER_LEVELS: DangerLevel[] = [
   { label: '建議直接睡覺', tone: 'sleep' },
   { label: 'AI 放棄治療', tone: 'giveup' },
 ]
-
-function pickDisclaimer(personalityId: PersonalityId) {
-  const pool = PERSONALITY_DISCLAIMERS[personalityId]
-  return pool[Math.floor(Math.random() * pool.length)]
-}
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -79,7 +74,7 @@ export function buildReportExtras(
     professionalMetrics: metrics,
     dangerLevel:
       DANGER_LEVELS[Math.floor(Math.random() * DANGER_LEVELS.length)],
-    disclaimer: pickDisclaimer(personalityId),
+    disclaimer: pickPersonalityDisclaimer(personalityId),
     radarValues: Array.from({ length: 5 }, () => randomInt(35, 95)),
   }
 }

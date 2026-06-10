@@ -66,6 +66,14 @@ export const SHARE_BRAND: Record<PersonalityId, ShareBrandTheme> = {
     accentBg: 'rgba(192, 132, 252, 0.12)',
     memeTag: '情勒關心',
   },
+  ancient: {
+    accent: '#d4a84b',
+    accentDim: 'rgba(212, 168, 75, 0.75)',
+    accentSoft: 'rgba(212, 168, 75, 0.3)',
+    accentGlow: 'rgba(212, 168, 75, 0.45)',
+    accentBg: 'rgba(139, 26, 26, 0.15)',
+    memeTag: '欽天監聖旨',
+  },
 }
 
 export function getShareBrandStyle(

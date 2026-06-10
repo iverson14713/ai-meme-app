@@ -1,3 +1,5 @@
+import { getPersonalityDefinition } from '../personalities/index.js'
+import type { PersonalityId } from '../personalities/types.js'
 import type { AnalysisResult } from '../types/analysis'
 import type {
   ActiveRareEvent,
@@ -259,6 +261,75 @@ const COMMON_EVENTS: CommonRareEvent[] = [
     ],
     footer: '冷靜不是退縮，是你需要裝一下。',
   },
+  {
+    id: 'court-tired',
+    badge: 'RARE // IMPERIAL',
+    title: '本宮已乏',
+    loadingLines: [
+      '欽天監正在翻奏摺...',
+      '奏摺堆積如山...',
+      '本宮揉了揉眉心...',
+      '本宮乏了，不想批奏摺。',
+    ],
+    analysis: [
+      '聖旨：今日休朝。',
+      '奏摺：明日再說。',
+      '皇上：自行定奪。',
+    ],
+    finalVerdict: '本宮乏了，不想批奏摺。',
+    stats: [
+      { label: '疲憊指數', value: 98 },
+      { label: '批閱意願', value: 2 },
+      { label: '想下班', value: 99 },
+    ],
+    footer: '欽天監今日 K PI：活着。',
+  },
+  {
+    id: 'empress-dowager',
+    badge: 'RARE // DOWAGER',
+    title: '太后介入',
+    loadingLines: [
+      '正在呈報太后...',
+      '慈寧宮傳來消息...',
+      '此事驚動聖聽...',
+      '此事驚動太后，系統暫停分析。',
+    ],
+    analysis: [
+      '太后：知道了。',
+      '欽天監：不敢言。',
+      '結論：先跪著。',
+    ],
+    finalVerdict: '此事驚動太后，系統暫停分析。',
+    stats: [
+      { label: '驚動程度', value: 99 },
+      { label: '膽子大小', value: 3 },
+      { label: '跪姿標準', value: 95 },
+    ],
+    footer: '在太后面前，AI 也只是個奴才。',
+  },
+  {
+    id: 'qintian-refuse',
+    badge: 'RARE // QINTIAN',
+    title: '欽天監拒絕',
+    loadingLines: [
+      '欽天監接旨...',
+      '翻閱命數檔案...',
+      '天象顯示：此題超綱...',
+      '欽天監拒絕回答此題。',
+    ],
+    analysis: [
+      '天象：不可說。',
+      '命數：自己悟。',
+      '欽天監：已退朝。',
+    ],
+    finalVerdict: '欽天監拒絕回答此題。',
+    stats: [
+      { label: '配合度', value: 1 },
+      { label: '超綱程度', value: 97 },
+      { label: '欽天監心情', value: 8 },
+    ],
+    footer: '有些問題，連欽天監都不想觀星。',
+  },
 ]
 
 const TRUTH_EVENTS: TruthRareEvent[] = [
@@ -338,23 +409,90 @@ function pickRandom<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)]
 }
 
-export function rollRareEvent(): ActiveRareEvent | null {
+function buildPersonalityRareEvents(
+  personalityId: PersonalityId,
+): CommonRareEvent[] {
+  const def = getPersonalityDefinition(personalityId)
+  return def.rareEvents.map((verdict, i) => ({
+    id: `${personalityId}-rare-${i}`,
+    badge: `RARE // ${def.name.toUpperCase()}`,
+    title: `${def.name} 異常`,
+    loadingLines: [
+      def.loadingMessages[i % def.loadingMessages.length],
+      def.loadingMessages[(i + 1) % def.loadingMessages.length],
+      verdict,
+    ],
+    analysis: [
+      def.commonPatterns[0] ?? '……',
+      def.commonPatterns[1] ?? '……',
+      '依此人格世界觀，此事已有定數。',
+    ] as [string, string, string],
+    finalVerdict: verdict,
+    stats: [
+      { label: '世界觀濃度', value: 90 + (i % 9) },
+      { label: '離譜指數', value: 82 + (i % 15) },
+      { label: '配合度', value: 8 + i },
+    ] as AnalysisResult['stats'],
+    footer: def.disclaimers[0],
+  }))
+}
+
+function buildPersonalityTruthEvents(
+  personalityId: PersonalityId,
+): TruthRareEvent[] {
+  const def = getPersonalityDefinition(personalityId)
+  return def.truthEvents.map((verdict, i) => ({
+    id: `${personalityId}-truth-${i}`,
+    badge: 'TRUTH // SILENT',
+    title: '深度掃描',
+    loadingLines: ['正在掃描...', '沒有笑話。', verdict],
+    analysis: ['沒有笑話。', verdict, '只有一秒鐘的認真。'] as [
+      string,
+      string,
+      string,
+    ],
+    finalVerdict: verdict,
+    stats: [
+      { label: '自欺程度', value: 88 + (i % 10) },
+      { label: '心裡清楚', value: 90 + (i % 9) },
+      { label: '逃避指數', value: 84 + (i % 12) },
+    ] as AnalysisResult['stats'],
+    footer: '',
+  }))
+}
+
+function getCommonPool(personalityId: PersonalityId): CommonRareEvent[] {
+  return [...COMMON_EVENTS, ...buildPersonalityRareEvents(personalityId)]
+}
+
+function getTruthPool(personalityId: PersonalityId): TruthRareEvent[] {
+  return [...TRUTH_EVENTS, ...buildPersonalityTruthEvents(personalityId)]
+}
+
+export function rollRareEvent(
+  personalityId: PersonalityId,
+): ActiveRareEvent | null {
   const r = Math.random()
   if (r < RARE_ULTRA_CHANCE) return { tier: 'ultra' }
   if (r < RARE_ULTRA_CHANCE + RARE_TRUTH_CHANCE) {
-    return { tier: 'truth', event: pickRandom(TRUTH_EVENTS) }
+    return { tier: 'truth', event: pickRandom(getTruthPool(personalityId)) }
   }
   if (r < RARE_ULTRA_CHANCE + RARE_TRUTH_CHANCE + RARE_COMMON_CHANCE) {
-    return { tier: 'common', event: pickRandom(COMMON_EVENTS) }
+    return { tier: 'common', event: pickRandom(getCommonPool(personalityId)) }
   }
   return null
 }
 
 /** 測試用：強制指定稀有事件 */
-export function forceRareEvent(tier: DebugForceRareTier): ActiveRareEvent {
+export function forceRareEvent(
+  tier: DebugForceRareTier,
+  personalityId: PersonalityId,
+): ActiveRareEvent {
   if (tier === 'ultra') return { tier: 'ultra' }
-  if (tier === 'truth') return { tier: 'truth', event: pickRandom(TRUTH_EVENTS) }
-  return { tier: 'common', event: pickRandom(COMMON_EVENTS) }
+  if (tier === 'truth') {
+    return { tier: 'truth', event: pickRandom(getTruthPool(personalityId)) }
+  }
+  return { tier: 'common', event: pickRandom(getCommonPool(personalityId)) }
 }
 
 export function getRareLoadingMs(tier: 'common' | 'truth') {

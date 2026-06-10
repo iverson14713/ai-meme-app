@@ -25,6 +25,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     ref,
   ) {
     const isTruth = variant === 'truth'
+    const isAncient = !isTruth && personality.id === 'ancient'
     const brand = SHARE_BRAND[personality.id]
     const siteUrl = getShareSiteUrl()
 
@@ -46,6 +47,15 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         <div className="share-card-scanlines" aria-hidden="true" />
         {!isTruth && <div className="share-card-grid-bg" aria-hidden="true" />}
 
+        {isAncient && (
+          <>
+            <div className="share-card-imperial-border" aria-hidden="true" />
+            <div className="share-card-imperial-seal" aria-hidden="true">
+              <span className="share-card-imperial-seal-inner">璽</span>
+            </div>
+          </>
+        )}
+
         {variant === 'rare' || variant === 'ultra' ? (
           <div className="share-card-rare-stamp" aria-hidden="true">
             {variant === 'ultra' ? 'CRASH' : 'RARE'}
@@ -63,7 +73,11 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             <ShareBrandLogo personalityId={personality.id} muted={isTruth} />
             <div className="share-card-brand-text">
               <p className="share-card-brand-kicker">
-                {isTruth ? 'SILENT TRUTH SCAN' : 'MEME AI BRAND'}
+                {isTruth
+                  ? 'SILENT TRUTH SCAN'
+                  : isAncient
+                    ? 'IMPERIAL AI DECREE'
+                    : 'MEME AI BRAND'}
               </p>
               <h2 className="share-card-logo">AI有點嘴</h2>
               <p className="share-card-personality">{personality.name}</p>
@@ -77,8 +91,17 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
 
         <main className={`share-card-main ${isTruth ? 'share-card-main--truth' : ''}`}>
           <span className="share-card-verdict-label">
-            {isTruth ? 'AI 安靜地說' : 'AI 看透你說'}
+            {isTruth
+              ? 'AI 安靜地說'
+              : isAncient
+                ? '欽天監聖旨批覆'
+                : 'AI 看透你說'}
           </span>
+          {isAncient && (
+            <p className="share-card-decreet-preamble" aria-hidden="true">
+              奉天承運 · 詔曰
+            </p>
+          )}
           <p className="share-card-verdict">「{result.finalVerdict}」</p>
         </main>
 

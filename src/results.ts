@@ -1,13 +1,9 @@
-import type { PersonalityId } from './personalities'
-import { pickPersonalityVerdict } from './personalityResults'
-import type { AnalysisResult, StatItem } from './types/analysis'
+import type { PersonalityId } from './personalities/index.js'
+import { pickPersonalityVerdict } from './personalityResults.js'
+import type { AnalysisResult, StatItem } from './types/analysis.js'
+import type { QuestionCategory } from './types/questionCategory.js'
 
-export type QuestionCategory =
-  | 'work'
-  | 'love'
-  | 'food'
-  | 'investment'
-  | 'general'
+export type { QuestionCategory } from './types/questionCategory.js'
 
 type ResultTemplate = {
   verdict: string

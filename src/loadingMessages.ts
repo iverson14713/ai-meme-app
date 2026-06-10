@@ -8,4 +8,4 @@ export {
   PERSONALITIES,
   type PersonalityId,
   type Personality,
-} from './personalities'
+} from './personalities/index.js'

@@ -1,4 +1,4 @@
-import type { PersonalityId } from '../src/personalities.js'
+import type { PersonalityId } from '../src/personalities/index.js'
 import {
   buildSystemPrompt,
   buildUserPrompt,
@@ -13,6 +13,7 @@ export const VALID_PERSONALITY_IDS: PersonalityId[] = [
   'lovebrain',
   'zen',
   'guilt',
+  'ancient',
 ]
 
 function clampStatValue(value: unknown): number {
