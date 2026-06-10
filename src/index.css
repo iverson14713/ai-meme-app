@@ -1101,3 +1101,309 @@ code {
   flex-wrap: wrap;
   justify-content: center;
 }
+
+/* 分享卡 */
+.share-section-label {
+  margin: 0 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--neon-dim);
+  font-family: ui-monospace, Consolas, monospace;
+  text-align: center;
+}
+
+.share-card-preview-wrap {
+  width: min(360px, 92vw);
+  margin: 0 auto 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 0 32px var(--neon-soft),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.share-card-export {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #050508;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px 20px;
+  box-sizing: border-box;
+  position: relative;
+  border: 2px solid color-mix(in srgb, var(--neon) 45%, transparent);
+  font-family: system-ui, 'Segoe UI', sans-serif;
+  color: white;
+}
+
+.share-card-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.012) 3px,
+    rgba(255, 255, 255, 0.012) 4px
+  );
+}
+
+.share-card-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--neon) 30%, transparent);
+}
+
+.share-card-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.share-card-seal {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--neon-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--neon);
+  box-shadow: 0 0 14px var(--neon-soft);
+  flex-shrink: 0;
+}
+
+.share-card-logo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--neon);
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 0 10px var(--neon-glow),
+    0 0 24px var(--neon-soft);
+}
+
+.share-card-personality {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--neon-dim);
+  letter-spacing: 0.06em;
+}
+
+.share-card-badge {
+  align-self: flex-start;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--neon-dim);
+  border: 1px solid var(--neon-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.share-card-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px 8px;
+  min-height: 0;
+}
+
+.share-card-verdict-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--neon-dim);
+  margin-bottom: 14px;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.share-card-verdict {
+  margin: 0;
+  font-size: clamp(22px, 7vw, 28px);
+  font-weight: 800;
+  line-height: 1.45;
+  color: var(--neon);
+  text-shadow:
+    0 0 12px var(--neon-glow),
+    0 0 28px var(--neon-soft),
+    0 0 48px color-mix(in srgb, var(--neon) 20%, transparent);
+}
+
+.share-card-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.share-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.share-card-stat {
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--neon) 18%, transparent);
+  background: rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
+.share-card-stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--neon);
+  font-family: ui-monospace, Consolas, monospace;
+  text-shadow: 0 0 8px var(--neon-glow);
+}
+
+.share-card-stat-label {
+  display: block;
+  font-size: 8px;
+  opacity: 0.55;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.share-card-radar {
+  display: flex;
+  justify-content: center;
+  opacity: 0.75;
+}
+
+.share-card-radar-svg {
+  width: 100px;
+  height: auto;
+}
+
+.share-radar-grid {
+  fill: none;
+  stroke: color-mix(in srgb, var(--neon) 15%, transparent);
+  stroke-width: 0.8;
+}
+
+.share-radar-axis {
+  stroke: color-mix(in srgb, var(--neon) 18%, transparent);
+  stroke-width: 0.8;
+}
+
+.share-radar-data {
+  fill: color-mix(in srgb, var(--neon) 22%, transparent);
+  stroke: var(--neon);
+  stroke-width: 1.5;
+}
+
+.share-radar-label {
+  fill: var(--neon-dim);
+  font-size: 7px;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.share-card-disclaimer {
+  margin: 0;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  text-align: center;
+  line-height: 1.4;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.share-card-brand {
+  margin: 4px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--neon-dim);
+  text-align: center;
+  font-family: ui-monospace, Consolas, monospace;
+  opacity: 0.7;
+}
+
+.share-image-preview {
+  width: min(200px, 50vw);
+  margin: 0 auto 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--neon-soft);
+  box-shadow: 0 0 20px var(--neon-soft);
+}
+
+.share-image-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.share-error {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: #ff6b6b;
+  text-align: center;
+}
+
+.download-button {
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 16px;
+  border: 2px solid var(--neon);
+  background: transparent;
+  color: var(--neon);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.download-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.download-button:not(:disabled):hover {
+  box-shadow: 0 0 16px var(--neon-soft);
+}
+
+.result-details {
+  width: 100%;
+  margin-top: 8px;
+  text-align: left;
+}
+
+.result-details summary {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding: 8px 0;
+  list-style: none;
+  text-align: center;
+}
+
+.result-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.result-details[open] summary {
+  margin-bottom: 16px;
+}
+
+.result-details .meme-card {
+  margin-top: 8px;
+}

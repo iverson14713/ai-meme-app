@@ -14,6 +14,8 @@ import { buildReportExtras, type ReportExtras } from './reportExtras'
 import type { AnalysisResult } from './types/analysis'
 import { AnimatedNumber } from './components/AnimatedNumber'
 import { FakeRadarChart } from './components/FakeRadarChart'
+import { ShareCard } from './components/ShareCard'
+import { downloadShareImage, generateShareImage } from './utils/shareImage'
 
 type Phase = 'home' | 'loading' | 'result'
 
@@ -74,10 +76,6 @@ export default function App() {
     setLoadingAnimationDone(false)
     setPendingResult(null)
     setLoadingMessages([])
-  }
-
-  const handleShare = () => {
-    // 分享功能待實作
   }
 
   useEffect(() => {
@@ -159,7 +157,6 @@ export default function App() {
           report={report}
           personality={personality}
           onRetry={resetToHome}
-          onShare={handleShare}
         />
       )}
     </div>
@@ -273,69 +270,119 @@ function ResultView({
   report,
   personality,
   onRetry,
-  onShare,
 }: {
   question: string
   result: AnalysisResult
   report: ReportExtras
   personality: ReturnType<typeof getPersonality>
   onRetry: () => void
-  onShare: () => void
 }) {
+  const shareCardRef = useRef<HTMLDivElement>(null)
+  const [shareImageUrl, setShareImageUrl] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [shareError, setShareError] = useState('')
+
+  const handleGenerateShare = async () => {
+    if (!shareCardRef.current) return
+    setIsGenerating(true)
+    setShareError('')
+    try {
+      const url = await generateShareImage(shareCardRef.current)
+      setShareImageUrl(url)
+    } catch {
+      setShareError('生成失敗，請再試一次')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleDownloadShare = () => {
+    if (!shareImageUrl) return
+    downloadShareImage(shareImageUrl)
+  }
+
   return (
     <div className="view fade-in result-view meme-result">
-      <article className="meme-card card-appear">
-        <p className="meme-question">「{question}」</p>
+      <p className="share-section-label">分享卡預覽 · IG 限動比例</p>
 
-        <ul className="analysis-lines card-appear">
-          {result.analysis.map((line, i) => (
-            <li key={`${line}-${i}`} style={{ animationDelay: `${0.05 * i}s` }}>
-              {line}
-            </li>
-          ))}
-        </ul>
+      <div className="share-card-preview-wrap">
+        <ShareCard
+          ref={shareCardRef}
+          result={result}
+          report={report}
+          personality={personality}
+        />
+      </div>
 
-        <section className="verdict-hero card-appear">
-          <div className="verdict-hero-top">
-            <span className="verdict-hero-badge">AI 最終判定</span>
-            <span className={`danger-badge danger-badge--mini danger-${report.dangerLevel.tone}`}>
-              {report.dangerLevel.label}
-            </span>
-          </div>
-          <p className="verdict-hero-text glow-text">「{result.finalVerdict}」</p>
-          <p className="verdict-hero-meta">
-            {personality.name} · #{report.reportId.slice(-4)}
-            {result.source === 'fallback' ? ' · 離線模式' : ''}
-          </p>
-        </section>
+      {shareImageUrl && (
+        <div className="share-image-preview fade-in">
+          <img src={shareImageUrl} alt="AI有點嘴分享圖預覽" />
+        </div>
+      )}
 
-        <FakeRadarChart values={report.radarValues} />
-
-        <section className="stats-compact card-appear" style={{ animationDelay: '0.25s' }}>
-          <div className="stats-compact-grid stats-compact-grid--three">
-            {result.stats.map((stat, i) => (
-              <div className="stat-compact" key={`${stat.label}-${i}`}>
-                <AnimatedNumber value={stat.value} duration={900 + i * 80} />
-                <span className="stat-compact-label">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      </article>
+      {shareError && <p className="share-error">{shareError}</p>}
 
       <div className="result-actions result-actions--meme">
         <button
           className="share-button-primary scale-button"
-          onClick={onShare}
+          onClick={handleGenerateShare}
+          disabled={isGenerating}
         >
-          分享這句嘴炮
+          {isGenerating ? '生成中...' : '生成分享圖'}
+        </button>
+        <button
+          className="download-button scale-button"
+          onClick={handleDownloadShare}
+          disabled={!shareImageUrl}
+        >
+          下載圖片
         </button>
         <button className="retry-button-subtle scale-button" onClick={onRetry}>
           再問一次
         </button>
       </div>
 
-      <p className="meme-disclaimer">{report.disclaimer}</p>
+      <details className="result-details">
+        <summary>查看完整分析</summary>
+        <article className="meme-card card-appear">
+          <p className="meme-question">「{question}」</p>
+
+          <ul className="analysis-lines card-appear">
+            {result.analysis.map((line, i) => (
+              <li key={`${line}-${i}`} style={{ animationDelay: `${0.05 * i}s` }}>
+                {line}
+              </li>
+            ))}
+          </ul>
+
+          <section className="verdict-hero card-appear">
+            <div className="verdict-hero-top">
+              <span className="verdict-hero-badge">AI 最終判定</span>
+              <span className={`danger-badge danger-badge--mini danger-${report.dangerLevel.tone}`}>
+                {report.dangerLevel.label}
+              </span>
+            </div>
+            <p className="verdict-hero-text glow-text">「{result.finalVerdict}」</p>
+            <p className="verdict-hero-meta">
+              {personality.name} · #{report.reportId.slice(-4)}
+              {result.source === 'fallback' ? ' · 離線模式' : ''}
+            </p>
+          </section>
+
+          <FakeRadarChart values={report.radarValues} />
+
+          <section className="stats-compact card-appear" style={{ animationDelay: '0.25s' }}>
+            <div className="stats-compact-grid stats-compact-grid--three">
+              {result.stats.map((stat, i) => (
+                <div className="stat-compact" key={`${stat.label}-${i}`}>
+                  <AnimatedNumber value={stat.value} duration={900 + i * 80} />
+                  <span className="stat-compact-label">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        </article>
+      </details>
     </div>
   )
 }
