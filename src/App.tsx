@@ -22,6 +22,7 @@ import { UpgradeModal } from './components/UpgradeModal'
 import {
   buildCommonRareResult,
   buildUltraRareResult,
+  forceRareEvent,
   RARE_LOADING_MS,
   rollRareEvent,
 } from './rareEvents/rareEvents'
@@ -68,6 +69,9 @@ export default function App() {
   )
   const [activeRare, setActiveRare] = useState<ActiveRareEvent | null>(null)
   const [rareProgress, setRareProgress] = useState(0)
+  const [debugForceRare, setDebugForceRare] = useState<'common' | 'ultra' | null>(
+    null,
+  )
 
   const personality = getPersonality(personalityId)
 
@@ -97,6 +101,24 @@ export default function App() {
     setUpgradeOpen(false)
   }
 
+  const handleArmRare = (tier: 'common' | 'ultra') => {
+    setDebugForceRare((prev) => (prev === tier ? null : tier))
+  }
+
+  const beginRareFlow = (rareRoll: ActiveRareEvent) => {
+    analysisSessionRef.current += 1
+    setActiveRare(rareRoll)
+    setReport(buildReportExtras(personalityId))
+    setRareProgress(0)
+    setPendingResult(null)
+
+    if (rareRoll.tier === 'ultra') {
+      setPhase('rare-crash')
+    } else {
+      setPhase('rare-loading')
+    }
+  }
+
   const startAnalysis = () => {
     const trimmed = question.trim()
     if (!trimmed) return
@@ -116,18 +138,15 @@ export default function App() {
 
     setUsage(consumeUsage())
 
-    const rareRoll = rollRareEvent()
-    if (rareRoll) {
-      setActiveRare(rareRoll)
-      setReport(buildReportExtras(personalityId))
-      setRareProgress(0)
-      setPendingResult(null)
+    const forcedRare = debugForceRare
+    if (forcedRare) setDebugForceRare(null)
 
-      if (rareRoll.tier === 'ultra') {
-        setPhase('rare-crash')
-      } else {
-        setPhase('rare-loading')
-      }
+    const rareRoll = forcedRare
+      ? forceRareEvent(forcedRare)
+      : rollRareEvent()
+
+    if (rareRoll) {
+      beginRareFlow(rareRoll)
       return
     }
 
@@ -276,6 +295,8 @@ export default function App() {
           onPersonalityChange={handlePersonalityChange}
           onStart={startAnalysis}
           onTogglePro={handleTogglePro}
+          debugForceRare={debugForceRare}
+          onArmRare={handleArmRare}
         />
       )}
       {phase === 'loading' && (
@@ -324,6 +345,8 @@ function HomeView({
   onPersonalityChange,
   onStart,
   onTogglePro,
+  debugForceRare,
+  onArmRare,
 }: {
   question: string
   personalityId: PersonalityId
@@ -332,6 +355,8 @@ function HomeView({
   onPersonalityChange: (id: PersonalityId) => void
   onStart: () => void
   onTogglePro: () => void
+  debugForceRare: 'common' | 'ultra' | null
+  onArmRare: (tier: 'common' | 'ultra') => void
 }) {
   const planLabel = usage.isPro ? 'PRO' : 'Free'
 
@@ -390,13 +415,32 @@ function HomeView({
         開始量子分析
       </button>
 
-      <button
-        type="button"
-        className="debug-pro-toggle"
-        onClick={onTogglePro}
-      >
-        切換 PRO 模式（測試）
-      </button>
+      <div className="debug-panel">
+        <p className="debug-panel-label">DEBUG</p>
+        <button type="button" className="debug-pro-toggle" onClick={onTogglePro}>
+          切換 PRO 模式
+        </button>
+        <button
+          type="button"
+          className={`debug-pro-toggle ${debugForceRare === 'common' ? 'debug-pro-toggle--active' : ''}`}
+          onClick={() => onArmRare('common')}
+        >
+          {debugForceRare === 'common' ? '✓ 下次：強制稀有事件' : '強制稀有事件'}
+        </button>
+        <button
+          type="button"
+          className={`debug-pro-toggle ${debugForceRare === 'ultra' ? 'debug-pro-toggle--active' : ''}`}
+          onClick={() => onArmRare('ultra')}
+        >
+          {debugForceRare === 'ultra' ? '✓ 下次：強制 AI 崩潰' : '強制 AI 崩潰'}
+        </button>
+        {debugForceRare && (
+          <p className="debug-armed-hint">
+            已武裝：下次「開始量子分析」將觸發
+            {debugForceRare === 'ultra' ? ' AI 崩潰' : ' 稀有事件'}
+          </p>
+        )}
+      </div>
     </div>
   )
 }

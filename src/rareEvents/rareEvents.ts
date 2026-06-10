@@ -206,6 +206,12 @@ export function rollRareEvent(): ActiveRareEvent | null {
   return null
 }
 
+/** 測試用：強制指定稀有事件 */
+export function forceRareEvent(tier: 'common' | 'ultra'): ActiveRareEvent {
+  if (tier === 'ultra') return { tier: 'ultra' }
+  return { tier: 'common', event: pickRandom(COMMON_EVENTS) }
+}
+
 export function buildCommonRareResult(event: CommonRareEvent): AnalysisResult {
   return {
     analysis: event.analysis,
