@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   LOADING_HOLD_MS,
   LOADING_MESSAGE_INTERVAL_MS,
@@ -8,8 +8,10 @@ import {
   pickLoadingMessages,
   type PersonalityId,
 } from './loadingMessages'
-import { pickResult, type AnalysisResult } from './results'
+import { pickResult } from './results'
+import { fetchAnalysis } from './services/fetchAnalysis'
 import { buildReportExtras, type ReportExtras } from './reportExtras'
+import type { AnalysisResult } from './types/analysis'
 import { AnimatedNumber } from './components/AnimatedNumber'
 import { FakeRadarChart } from './components/FakeRadarChart'
 
@@ -23,20 +25,30 @@ export default function App() {
   const [loadingMessages, setLoadingMessages] = useState<string[]>([])
   const [messageIndex, setMessageIndex] = useState(0)
   const [isLoadingHold, setIsLoadingHold] = useState(false)
+  const [loadingAnimationDone, setLoadingAnimationDone] = useState(false)
+  const [pendingResult, setPendingResult] = useState<AnalysisResult | null>(null)
   const [result, setResult] = useState<AnalysisResult>(() =>
     pickResult('', 'normal'),
   )
   const [report, setReport] = useState<ReportExtras>(() =>
     buildReportExtras('normal'),
   )
+  const analysisSessionRef = useRef(0)
 
   const personality = getPersonality(personalityId)
 
   const startAnalysis = () => {
-    if (!question.trim()) return
+    const trimmed = question.trim()
+    if (!trimmed) return
+
+    const session = analysisSessionRef.current + 1
+    analysisSessionRef.current = session
+
     setProgress(0)
     setMessageIndex(0)
     setIsLoadingHold(false)
+    setLoadingAnimationDone(false)
+    setPendingResult(null)
     setLoadingMessages(
       pickLoadingMessages(
         personalityId,
@@ -44,16 +56,23 @@ export default function App() {
         LOADING_MESSAGE_INTERVAL_MS,
       ),
     )
-    setResult(pickResult(question.trim(), personalityId))
     setReport(buildReportExtras(personalityId))
     setPhase('loading')
+
+    fetchAnalysis(trimmed, personalityId).then((analysisResult) => {
+      if (analysisSessionRef.current !== session) return
+      setPendingResult(analysisResult)
+    })
   }
 
   const resetToHome = () => {
+    analysisSessionRef.current += 1
     setPhase('home')
     setProgress(0)
     setMessageIndex(0)
     setIsLoadingHold(false)
+    setLoadingAnimationDone(false)
+    setPendingResult(null)
     setLoadingMessages([])
   }
 
@@ -67,7 +86,7 @@ export default function App() {
     const tickMs = 50
     const steps = LOADING_PROGRESS_MS / tickMs
     let step = 0
-    let resultTimeout: number | undefined
+    let holdTimeout: number | undefined
 
     const messageTimer = window.setInterval(() => {
       setMessageIndex((prev) => {
@@ -86,20 +105,32 @@ export default function App() {
       window.clearInterval(progressTimer)
       setProgress(99)
       setIsLoadingHold(true)
-      resultTimeout = window.setTimeout(() => setPhase('result'), LOADING_HOLD_MS)
+      holdTimeout = window.setTimeout(
+        () => setLoadingAnimationDone(true),
+        LOADING_HOLD_MS,
+      )
     }, LOADING_PROGRESS_MS)
 
     return () => {
       window.clearInterval(messageTimer)
       window.clearInterval(progressTimer)
       window.clearTimeout(completeTimer)
-      if (resultTimeout !== undefined) window.clearTimeout(resultTimeout)
+      if (holdTimeout !== undefined) window.clearTimeout(holdTimeout)
     }
   }, [phase, loadingMessages])
 
-  const loadingMessage = isLoadingHold
-    ? personality.holdMessage
-    : (loadingMessages[messageIndex] ?? loadingMessages[0] ?? '')
+  useEffect(() => {
+    if (phase !== 'loading' || !loadingAnimationDone || !pendingResult) return
+    setResult(pendingResult)
+    setPhase('result')
+  }, [phase, loadingAnimationDone, pendingResult])
+
+  const waitingForApi = isLoadingHold && !pendingResult
+  const loadingMessage = waitingForApi
+    ? 'AI 正在同步量子結論...'
+    : isLoadingHold
+      ? personality.holdMessage
+      : (loadingMessages[messageIndex] ?? loadingMessages[0] ?? '')
 
   return (
     <div className={`app-shell theme-${personalityId}`}>
@@ -117,8 +148,8 @@ export default function App() {
           personality={personality}
           progress={progress}
           message={loadingMessage}
-          messageKey={isLoadingHold ? 'hold' : messageIndex}
-          isHold={isLoadingHold}
+          messageKey={waitingForApi ? 'api-wait' : isLoadingHold ? 'hold' : messageIndex}
+          isHold={isLoadingHold || waitingForApi}
         />
       )}
       {phase === 'result' && (
@@ -251,18 +282,18 @@ function ResultView({
   onRetry: () => void
   onShare: () => void
 }) {
-  const allStats = [
-    ...report.professionalMetrics.map((m) => ({
-      label: m.label,
-      value: m.value,
-    })),
-    ...result.stats.map((s) => ({ label: s.label, value: s.value })),
-  ]
-
   return (
     <div className="view fade-in result-view meme-result">
       <article className="meme-card card-appear">
         <p className="meme-question">「{question}」</p>
+
+        <ul className="analysis-lines card-appear">
+          {result.analysis.map((line, i) => (
+            <li key={`${line}-${i}`} style={{ animationDelay: `${0.05 * i}s` }}>
+              {line}
+            </li>
+          ))}
+        </ul>
 
         <section className="verdict-hero card-appear">
           <div className="verdict-hero-top">
@@ -271,22 +302,20 @@ function ResultView({
               {report.dangerLevel.label}
             </span>
           </div>
-          <p className="verdict-hero-text glow-text">「{result.verdict}」</p>
+          <p className="verdict-hero-text glow-text">「{result.finalVerdict}」</p>
           <p className="verdict-hero-meta">
             {personality.name} · #{report.reportId.slice(-4)}
+            {result.source === 'fallback' ? ' · 離線模式' : ''}
           </p>
         </section>
 
         <FakeRadarChart values={report.radarValues} />
 
         <section className="stats-compact card-appear" style={{ animationDelay: '0.25s' }}>
-          <div className="stats-compact-grid">
-            {allStats.map((stat, i) => (
+          <div className="stats-compact-grid stats-compact-grid--three">
+            {result.stats.map((stat, i) => (
               <div className="stat-compact" key={`${stat.label}-${i}`}>
-                <AnimatedNumber
-                  value={stat.value}
-                  duration={900 + i * 80}
-                />
+                <AnimatedNumber value={stat.value} duration={900 + i * 80} />
                 <span className="stat-compact-label">{stat.label}</span>
               </div>
             ))}

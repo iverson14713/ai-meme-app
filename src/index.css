@@ -530,6 +530,34 @@ code {
   line-height: 1.4;
 }
 
+.analysis-lines {
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--neon) 12%, transparent);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.analysis-lines li {
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  color: var(--neon-dim);
+  text-align: left;
+  line-height: 1.4;
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.analysis-lines li::before {
+  content: '› ';
+  color: var(--neon);
+  opacity: 0.7;
+}
+
 .verdict-hero {
   min-height: 200px;
   padding: 28px 20px 24px;
@@ -629,8 +657,11 @@ code {
 
 .stats-compact-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
+}
+
+.stats-compact-grid--three {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .stat-compact {

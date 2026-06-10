@@ -1,5 +1,6 @@
 import type { PersonalityId } from './personalities'
 import { pickPersonalityVerdict } from './personalityResults'
+import type { AnalysisResult, StatItem } from './types/analysis'
 
 export type QuestionCategory =
   | 'work'
@@ -7,16 +8,6 @@ export type QuestionCategory =
   | 'food'
   | 'investment'
   | 'general'
-
-export type AnalysisResult = {
-  category: QuestionCategory
-  verdict: string
-  stats: [
-    { label: string; value: number },
-    { label: string; value: number },
-    { label: string; value: number },
-  ]
-}
 
 type ResultTemplate = {
   verdict: string
@@ -392,6 +383,18 @@ export function classifyQuestion(question: string): QuestionCategory {
   return 'general'
 }
 
+const FALLBACK_ANALYSIS_LINES = [
+  '正在掃描你的猶豫指數...',
+  '偵測到經典自欺訊號...',
+  '量子通道確認：你心裡早有答案。',
+]
+
+function toStatTuple(
+  stats: ResultTemplate['stats'],
+): [StatItem, StatItem, StatItem] {
+  return [stats[0], stats[1], stats[2]]
+}
+
 export function pickResult(
   question: string,
   personalityId: PersonalityId = 'normal',
@@ -401,8 +404,9 @@ export function pickResult(
   const template = templates[Math.floor(Math.random() * templates.length)]
 
   return {
-    category,
-    verdict: pickPersonalityVerdict(personalityId, category),
-    stats: template.stats,
+    analysis: [...FALLBACK_ANALYSIS_LINES] as [string, string, string],
+    finalVerdict: pickPersonalityVerdict(personalityId, category),
+    stats: toStatTuple(template.stats),
+    source: 'fallback',
   }
 }
