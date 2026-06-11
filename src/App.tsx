@@ -46,6 +46,8 @@ import {
   type UsageSnapshot,
 } from './usage/planLimits'
 import { pickSplashDurationMs, pickSplashMessage } from './splash/splashMessages'
+import { Onboarding } from './components/Onboarding'
+import { isOnboardingCompleted } from './onboarding/onboardingStorage'
 
 type Phase =
   | 'home'
@@ -62,6 +64,7 @@ export default function App() {
   const [splashDone, setSplashDone] = useState(false)
   const [splashMessage] = useState(() => pickSplashMessage())
   const [splashDurationMs] = useState(() => pickSplashDurationMs())
+  const [onboardingDone, setOnboardingDone] = useState(() => isOnboardingCompleted())
   const [phase, setPhase] = useState<Phase>('home')
   const [question, setQuestion] = useState('')
   const [personalityId, setPersonalityId] = useState<PersonalityId>('normal')
@@ -338,6 +341,10 @@ export default function App() {
 
   if (!splashDone) {
     return <SplashScreen message={splashMessage} />
+  }
+
+  if (!onboardingDone) {
+    return <Onboarding onComplete={() => setOnboardingDone(true)} />
   }
 
   return (
