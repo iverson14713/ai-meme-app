@@ -1,24 +1,36 @@
 import { SHARE_LOGO_URL } from '../share/shareLogo'
 import { useSecretLogoTap } from '../dev/useSecretLogoTap'
+import {
+  RESTORE_NOT_FOUND_MESSAGE,
+  RESTORE_SUCCESS_MESSAGE,
+} from '../iap/restoreFeedback'
+import { isIapAvailable } from '../iap/subscriptionService'
 import type { UsageSnapshot } from '../usage/planLimits'
 
 type SettingsPageProps = {
   usage: UsageSnapshot
+  restoring: boolean
+  restoreMessage: string
   onBack: () => void
   onOpenPrivacy: () => void
   onOpenTerms: () => void
+  onRestorePurchases: () => void
   onSecretLogoTap: () => void
 }
 
 export function SettingsPage({
   usage,
+  restoring,
+  restoreMessage,
   onBack,
   onOpenPrivacy,
   onOpenTerms,
+  onRestorePurchases,
   onSecretLogoTap,
 }: SettingsPageProps) {
   const onLogoTap = useSecretLogoTap(onSecretLogoTap)
   const planLabel = usage.isDeveloper ? 'DEV' : usage.isPro ? 'PRO' : 'Free'
+  const iapAvailable = isIapAvailable()
 
   return (
     <div className="view fade-in settings-page">
@@ -51,9 +63,28 @@ export function SettingsPage({
             <span className="settings-plan-detail">
               {usage.isDeveloper
                 ? '開發者模式 · 無限次數'
-                : `今日剩餘 ${usage.remaining} / ${usage.dailyLimit} 次`}
+                : usage.isPro
+                  ? `PRO · 今日剩餘 ${usage.remaining} / ${usage.dailyLimit} 次`
+                  : `Free · 今日剩餘 ${usage.remaining} / ${usage.dailyLimit} 次`}
             </span>
           </div>
+          {iapAvailable && (
+            <button
+              type="button"
+              className="settings-restore-button scale-button"
+              onClick={onRestorePurchases}
+              disabled={restoring}
+            >
+              {restoring ? '恢復中...' : '恢復購買'}
+            </button>
+          )}
+          {restoreMessage && (
+            <p
+              className={`settings-restore-message ${restoreMessage === RESTORE_SUCCESS_MESSAGE ? 'settings-restore-message--success' : ''} ${restoreMessage !== RESTORE_SUCCESS_MESSAGE && restoreMessage !== RESTORE_NOT_FOUND_MESSAGE ? 'settings-restore-message--error' : ''}`}
+            >
+              {restoreMessage}
+            </p>
+          )}
         </section>
 
         <section className="settings-section">

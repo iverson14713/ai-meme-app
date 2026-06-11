@@ -1,4 +1,15 @@
 import { useEffect, useState } from 'react'
+import { PRO_PLAN_LABELS, WEB_UPGRADE_NOTE } from '../iap/constants'
+import {
+  isSuccessFeedbackMessage,
+  PURCHASE_CANCELLED_MESSAGE,
+  PURCHASE_SUCCESS_MESSAGE,
+} from '../iap/restoreFeedback'
+import {
+  isIapAvailable,
+  type ProductPriceInfo,
+  type ProPlan,
+} from '../iap/subscriptionService'
 import {
   pickRandomUpgradeRoast,
   type UpgradeRoastPick,
@@ -7,8 +18,15 @@ import {
 type UpgradeModalProps = {
   open: boolean
   variant: 'limit' | 'personality'
+  prices: ProductPriceInfo
+  purchasing: boolean
+  restoring: boolean
+  feedbackMessage: string
+  errorMessage: string
   onClose: () => void
-  onUpgrade: () => void
+  onPurchase: (plan: ProPlan) => void
+  onRestore: () => void
+  onClearMessages: () => void
 }
 
 const PRO_FEATURES = [
@@ -21,16 +39,26 @@ const PRO_FEATURES = [
 export function UpgradeModal({
   open,
   variant,
+  prices,
+  purchasing,
+  restoring,
+  feedbackMessage,
+  errorMessage,
   onClose,
-  onUpgrade,
+  onPurchase,
+  onRestore,
+  onClearMessages,
 }: UpgradeModalProps) {
   const [roast, setRoast] = useState<UpgradeRoastPick>(() => pickRandomUpgradeRoast())
+  const iapAvailable = isIapAvailable()
+  const isCancelled = errorMessage === PURCHASE_CANCELLED_MESSAGE
 
   useEffect(() => {
     if (open) {
       setRoast(pickRandomUpgradeRoast())
+      onClearMessages()
     }
-  }, [open])
+  }, [open, onClearMessages])
 
   if (!open) return null
 
@@ -71,28 +99,69 @@ export function UpgradeModal({
           ))}
         </ul>
 
-        <div className="upgrade-pricing">
-          <div className="upgrade-price-row">
-            <span className="upgrade-price-label">月費</span>
-            <span className="upgrade-price-value">NT$30/月</span>
+        {iapAvailable ? (
+          <div className="upgrade-pricing">
+            <button
+              type="button"
+              className="upgrade-price-option scale-button"
+              onClick={() => onPurchase('monthly')}
+              disabled={purchasing || restoring}
+            >
+              <span className="upgrade-price-label">{PRO_PLAN_LABELS.monthly}</span>
+              <span className="upgrade-price-value">{prices.monthly}</span>
+            </button>
+            <button
+              type="button"
+              className="upgrade-price-option upgrade-price-option--featured scale-button"
+              onClick={() => onPurchase('yearly')}
+              disabled={purchasing || restoring}
+            >
+              <span className="upgrade-price-label">{PRO_PLAN_LABELS.yearly}</span>
+              <span className="upgrade-price-value">{prices.yearly}</span>
+              <span className="upgrade-price-hint">最划算</span>
+            </button>
           </div>
-          <div className="upgrade-price-row">
-            <span className="upgrade-price-label">年費</span>
-            <span className="upgrade-price-value">NT$199/年</span>
-          </div>
-        </div>
+        ) : (
+          <p className="upgrade-web-note">{WEB_UPGRADE_NOTE}</p>
+        )}
+
+        {purchasing && <p className="upgrade-status">正在處理購買...</p>}
+        {restoring && <p className="upgrade-status">正在恢復購買...</p>}
+        {feedbackMessage && (
+          <p
+            className={`upgrade-feedback ${isSuccessFeedbackMessage(feedbackMessage) ? 'upgrade-feedback--success' : ''}`}
+          >
+            {feedbackMessage}
+          </p>
+        )}
+        {errorMessage && (
+          <p
+            className={
+              isCancelled ? 'upgrade-feedback upgrade-feedback--muted' : 'upgrade-error'
+            }
+          >
+            {errorMessage}
+          </p>
+        )}
+
+        {iapAvailable && (
+          <button
+            type="button"
+            className="upgrade-restore-link"
+            onClick={onRestore}
+            disabled={purchasing || restoring}
+          >
+            已購買？恢復購買
+          </button>
+        )}
 
         <button
           type="button"
-          className="neon-button scale-button upgrade-cta"
-          onClick={onUpgrade}
+          className="upgrade-close"
+          onClick={onClose}
+          disabled={purchasing || restoring}
         >
-          升級 PRO
-        </button>
-        <p className="upgrade-fake-note">測試模式：點擊即開通 PRO（尚未接付款）</p>
-
-        <button type="button" className="upgrade-close" onClick={onClose}>
-          先不要
+          {feedbackMessage === PURCHASE_SUCCESS_MESSAGE ? '開始使用 PRO' : '先不要'}
         </button>
       </div>
     </div>

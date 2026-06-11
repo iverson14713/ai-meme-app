@@ -122,5 +122,7 @@ export function setProMode(isPro: boolean): UsageSnapshot {
 }
 
 export function shouldShowUpgrade(): boolean {
-  return !isDeveloperUnlocked()
+  if (isDeveloperUnlocked()) return false
+  if (readIsPro()) return false
+  return true
 }

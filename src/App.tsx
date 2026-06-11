@@ -41,10 +41,15 @@ import { DeveloperUnlockModal } from './components/DeveloperUnlockModal'
 import { isDeveloperUnlocked } from './dev/developerMode'
 import { useSecretLogoTap } from './dev/useSecretLogoTap'
 import {
+  getRestoreFeedbackMessage,
+  PURCHASE_SUCCESS_MESSAGE,
+} from './iap/restoreFeedback'
+import { useSubscriptionSync } from './iap/useSubscriptionSync'
+import { showDebugPanel } from './platform/runtime'
+import {
   consumeUsage,
   isPersonalityUnlocked,
   loadUsageSnapshot,
-  setProMode,
   shouldShowUpgrade,
   toggleProMode,
   type UsageSnapshot,
@@ -101,6 +106,11 @@ export default function App() {
   )
   const [legalBackTarget, setLegalBackTarget] = useState<'home' | 'settings'>('home')
   const [developerUnlockOpen, setDeveloperUnlockOpen] = useState(false)
+  const [restoreMessage, setRestoreMessage] = useState('')
+  const [upgradeRestoreMessage, setUpgradeRestoreMessage] = useState('')
+
+  const subscription = useSubscriptionSync(setUsage)
+  const { clearActionError } = subscription
 
   const personality = getPersonality(personalityId)
 
@@ -147,9 +157,47 @@ export default function App() {
     setUsage(toggleProMode())
   }
 
-  const handleFakeUpgrade = () => {
-    setUsage(setProMode(true))
-    setUpgradeOpen(false)
+  const clearUpgradeMessages = useCallback(() => {
+    clearActionError()
+    setUpgradeRestoreMessage('')
+  }, [clearActionError])
+
+  const handlePurchasePlan = async (plan: 'monthly' | 'yearly') => {
+    clearUpgradeMessages()
+    const { snapshot, error, successMessage } = await subscription.purchasePlan(plan)
+    setUsage(snapshot)
+    if (successMessage && snapshot.isPro) {
+      setUpgradeRestoreMessage(PURCHASE_SUCCESS_MESSAGE)
+      window.setTimeout(() => {
+        setUpgradeOpen(false)
+        setUpgradeRestoreMessage('')
+      }, 1500)
+      return
+    }
+    if (error && !snapshot.isPro) {
+      return
+    }
+  }
+
+  const handleRestorePurchases = async () => {
+    setRestoreMessage('')
+    const { snapshot, error } = await subscription.restorePurchases()
+    setUsage(snapshot)
+    setRestoreMessage(getRestoreFeedbackMessage(snapshot, error))
+  }
+
+  const handleUpgradeRestore = async () => {
+    setUpgradeRestoreMessage('')
+    const { snapshot, error } = await subscription.restorePurchases()
+    setUsage(snapshot)
+    const message = getRestoreFeedbackMessage(snapshot, error)
+    if (error) {
+      return
+    }
+    setUpgradeRestoreMessage(message)
+    if (snapshot.isPro) {
+      setUpgradeOpen(false)
+    }
   }
 
   const handleArmRare = (tier: DebugForceRareTier) => {
@@ -370,8 +418,15 @@ export default function App() {
         <UpgradeModal
           open={upgradeOpen}
           variant={upgradeVariant}
+          prices={subscription.prices}
+          purchasing={subscription.purchasing}
+          restoring={subscription.restoring}
+          feedbackMessage={upgradeRestoreMessage}
+          errorMessage={subscription.actionError}
           onClose={() => setUpgradeOpen(false)}
-          onUpgrade={handleFakeUpgrade}
+          onPurchase={handlePurchasePlan}
+          onRestore={handleUpgradeRestore}
+          onClearMessages={clearUpgradeMessages}
         />
       )}
       <DeveloperUnlockModal
@@ -400,9 +455,12 @@ export default function App() {
       {phase === 'settings' && (
         <SettingsPage
           usage={usage}
+          restoring={subscription.restoring}
+          restoreMessage={restoreMessage}
           onBack={() => setPhase('home')}
           onOpenPrivacy={() => openPrivacy('settings')}
           onOpenTerms={() => openTerms('settings')}
+          onRestorePurchases={handleRestorePurchases}
           onSecretLogoTap={handleSecretLogoTap}
         />
       )}
@@ -554,7 +612,7 @@ function HomeView({
         開始量子分析
       </button>
 
-      {import.meta.env.DEV && (
+      {showDebugPanel() && (
         <div className="debug-panel">
           <p className="debug-panel-label">DEBUG</p>
           <button type="button" className="debug-pro-toggle" onClick={onTogglePro}>
