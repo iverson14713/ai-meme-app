@@ -1,3 +1,5 @@
+import { sha256Hex } from './sha256'
+
 const STORAGE_DEVELOPER = 'developer_unlocked'
 
 /** SHA-256 of developer passphrase — plaintext is not stored in source */
@@ -6,12 +8,11 @@ const DEVELOPER_CODE_HASH =
 
 export const DEVELOPER_DAILY_LIMIT = 999_999
 
-async function sha256Hex(text: string): Promise<string> {
-  const data = new TextEncoder().encode(text)
-  const buffer = await crypto.subtle.digest('SHA-256', data)
-  return Array.from(new Uint8Array(buffer))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
+function normalizeDeveloperInput(input: string): string {
+  return input
+    .trim()
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .normalize('NFKC')
 }
 
 export function isDeveloperUnlocked(): boolean {
@@ -30,9 +31,8 @@ export function unlockDeveloperMode(): void {
   }
 }
 
-export async function verifyDeveloperCode(input: string): Promise<boolean> {
-  const trimmed = input.trim()
-  if (!trimmed) return false
-  const hash = await sha256Hex(trimmed)
-  return hash === DEVELOPER_CODE_HASH
+export function verifyDeveloperCode(input: string): boolean {
+  const normalized = normalizeDeveloperInput(input)
+  if (!normalized) return false
+  return sha256Hex(normalized) === DEVELOPER_CODE_HASH
 }

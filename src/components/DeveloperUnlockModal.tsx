@@ -24,14 +24,13 @@ export function DeveloperUnlockModal({
     onClose()
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
     setChecking(true)
     setError('')
 
     try {
-      const valid = await verifyDeveloperCode(code)
-      if (!valid) {
+      if (!verifyDeveloperCode(code)) {
         setError('驗證失敗')
         return
       }
@@ -40,6 +39,8 @@ export function DeveloperUnlockModal({
       setCode('')
       onUnlocked()
       onClose()
+    } catch {
+      setError('驗證失敗')
     } finally {
       setChecking(false)
     }
@@ -63,11 +64,15 @@ export function DeveloperUnlockModal({
 
         <input
           className="dev-unlock-input"
-          type="password"
+          type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="開發者碼"
           autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          inputMode="text"
           autoFocus
         />
 
