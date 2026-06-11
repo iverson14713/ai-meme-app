@@ -1,5 +1,5 @@
 import type { PersonalityId } from './personalities/index.js'
-import { pickPersonalityVerdict } from './personalityResults.js'
+import { pickPersonalityAnalysisLines, pickPersonalityVerdict } from './personalityResults.js'
 import type { AnalysisResult, StatItem } from './types/analysis.js'
 import type { QuestionCategory } from './types/questionCategory.js'
 
@@ -379,12 +379,6 @@ export function classifyQuestion(question: string): QuestionCategory {
   return 'general'
 }
 
-const FALLBACK_ANALYSIS_LINES = [
-  '正在掃描你的猶豫指數...',
-  '偵測到經典自欺訊號...',
-  '量子通道確認：你心裡早有答案。',
-]
-
 function toStatTuple(
   stats: ResultTemplate['stats'],
 ): [StatItem, StatItem, StatItem] {
@@ -400,7 +394,7 @@ export function pickResult(
   const template = templates[Math.floor(Math.random() * templates.length)]
 
   return {
-    analysis: [...FALLBACK_ANALYSIS_LINES] as [string, string, string],
+    analysis: pickPersonalityAnalysisLines(personalityId),
     finalVerdict: pickPersonalityVerdict(personalityId, category),
     stats: toStatTuple(template.stats),
     source: 'fallback',

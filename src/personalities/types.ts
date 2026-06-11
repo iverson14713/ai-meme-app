@@ -29,6 +29,7 @@ export type PersonalityDefinition = {
   beliefs: string[]
   analysisStyle: string[]
   commonPatterns: string[]
+  sentencePatterns: string[]
   loadingMessages: string[]
   rareEvents: string[]
   truthEvents: string[]
