@@ -21,6 +21,10 @@ import { RareEventResultView } from './components/RareEventResultView'
 import { TruthEventLoadingView } from './components/TruthEventLoadingView'
 import { UpgradeModal } from './components/UpgradeModal'
 import { SplashScreen } from './components/SplashScreen'
+import { AppFooter } from './components/AppFooter'
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
+import { SettingsPage } from './pages/SettingsPage'
+import { TermsOfServicePage } from './pages/TermsOfServicePage'
 import {
   buildCommonRareResult,
   buildTruthRareResult,
@@ -44,6 +48,9 @@ import { pickSplashDurationMs, pickSplashMessage } from './splash/splashMessages
 
 type Phase =
   | 'home'
+  | 'settings'
+  | 'privacy'
+  | 'terms'
   | 'loading'
   | 'result'
   | 'rare-loading'
@@ -80,6 +87,7 @@ export default function App() {
   const [debugForceRare, setDebugForceRare] = useState<DebugForceRareTier | null>(
     null,
   )
+  const [legalBackTarget, setLegalBackTarget] = useState<'home' | 'settings'>('home')
 
   const personality = getPersonality(personalityId)
 
@@ -117,6 +125,22 @@ export default function App() {
 
   const handleArmRare = (tier: DebugForceRareTier) => {
     setDebugForceRare((prev) => (prev === tier ? null : tier))
+  }
+
+  const openSettings = () => setPhase('settings')
+
+  const openPrivacy = (from: 'home' | 'settings' = 'home') => {
+    setLegalBackTarget(from)
+    setPhase('privacy')
+  }
+
+  const openTerms = (from: 'home' | 'settings' = 'home') => {
+    setLegalBackTarget(from)
+    setPhase('terms')
+  }
+
+  const handleLegalBack = () => {
+    setPhase(legalBackTarget)
   }
 
   const beginRareFlow = (rareRoll: ActiveRareEvent) => {
@@ -326,8 +350,22 @@ export default function App() {
           onTogglePro={handleTogglePro}
           debugForceRare={debugForceRare}
           onArmRare={handleArmRare}
+          onOpenSettings={openSettings}
+          onOpenPrivacy={() => openPrivacy('home')}
+          onOpenTerms={() => openTerms('home')}
         />
       )}
+      {phase === 'settings' && (
+        <SettingsPage
+          usage={usage}
+          onBack={() => setPhase('home')}
+          onOpenPrivacy={() => openPrivacy('settings')}
+          onOpenTerms={() => openTerms('settings')}
+          onTogglePro={handleTogglePro}
+        />
+      )}
+      {phase === 'privacy' && <PrivacyPolicyPage onBack={handleLegalBack} />}
+      {phase === 'terms' && <TermsOfServicePage onBack={handleLegalBack} />}
       {phase === 'loading' && (
         <LoadingView
           personality={personality}
@@ -379,6 +417,9 @@ function HomeView({
   onTogglePro,
   debugForceRare,
   onArmRare,
+  onOpenSettings,
+  onOpenPrivacy,
+  onOpenTerms,
 }: {
   question: string
   personalityId: PersonalityId
@@ -389,6 +430,9 @@ function HomeView({
   onTogglePro: () => void
   debugForceRare: DebugForceRareTier | null
   onArmRare: (tier: DebugForceRareTier) => void
+  onOpenSettings: () => void
+  onOpenPrivacy: () => void
+  onOpenTerms: () => void
 }) {
   const planLabel = usage.isPro ? 'PRO' : 'Free'
 
@@ -484,6 +528,12 @@ function HomeView({
           </p>
         )}
       </div>
+
+      <AppFooter
+        onOpenSettings={onOpenSettings}
+        onOpenPrivacy={onOpenPrivacy}
+        onOpenTerms={onOpenTerms}
+      />
     </div>
   )
 }
