@@ -1,3 +1,9 @@
+import { useEffect, useState } from 'react'
+import {
+  pickRandomUpgradeRoast,
+  type UpgradeRoastPick,
+} from '../upgrade/randomUpgradeRoastTexts'
+
 type UpgradeModalProps = {
   open: boolean
   variant: 'limit' | 'personality'
@@ -18,17 +24,20 @@ export function UpgradeModal({
   onClose,
   onUpgrade,
 }: UpgradeModalProps) {
+  const [roast, setRoast] = useState<UpgradeRoastPick>(() => pickRandomUpgradeRoast())
+
+  useEffect(() => {
+    if (open) {
+      setRoast(pickRandomUpgradeRoast())
+    }
+  }, [open])
+
   if (!open) return null
 
   const title =
     variant === 'limit'
       ? '你的量子分析額度已用完'
       : '此功能需要 PRO'
-
-  const roastLine =
-    variant === 'limit'
-      ? '免費額度已耗盡，宇宙不再免費提供情緒分析。'
-      : null
 
   const subtitle =
     variant === 'limit'
@@ -48,7 +57,12 @@ export function UpgradeModal({
         <h2 id="upgrade-title" className="upgrade-title glow-text">
           {title}
         </h2>
-        {roastLine && <p className="upgrade-roast">{roastLine}</p>}
+        <p
+          className={`upgrade-roast upgrade-roast--${roast.tier}`}
+          key={roast.text}
+        >
+          {roast.text}
+        </p>
         <p className="upgrade-subtitle">{subtitle}</p>
 
         <ul className="upgrade-features">

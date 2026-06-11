@@ -920,6 +920,60 @@ code {
   margin: 0 0 12px;
   line-height: 1.55;
   text-shadow: 0 0 12px var(--neon-soft);
+  animation: upgrade-roast-in 0.35s ease-out;
+}
+
+.upgrade-roast--mild {
+  color: #a7f3d0;
+  text-shadow: 0 0 10px rgba(102, 255, 204, 0.35);
+}
+
+.upgrade-roast--medium {
+  color: var(--neon);
+  text-shadow: 0 0 14px var(--neon-glow);
+}
+
+.upgrade-roast--hell {
+  color: #ff8a8a;
+  text-shadow:
+    0 0 12px rgba(255, 107, 107, 0.45),
+    0 0 24px rgba(255, 68, 68, 0.2);
+}
+
+.upgrade-roast--ultra {
+  color: #fde68a;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 14px rgba(251, 191, 36, 0.55),
+    0 0 28px rgba(255, 215, 128, 0.25);
+  animation: upgrade-roast-ultra 1.6s ease-in-out infinite;
+}
+
+@keyframes upgrade-roast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes upgrade-roast-ultra {
+  0%,
+  100% {
+    opacity: 0.85;
+    filter: brightness(1);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
 }
 
 .upgrade-subtitle {
