@@ -1595,22 +1595,6 @@ code {
   transform: translateX(6px);
 }
 
-.share-brand-logo__chip {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  z-index: 5;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #050508;
-  background: var(--share-accent, #66ffcc);
-  box-shadow: 0 0 10px var(--share-accent-glow, rgba(102, 255, 204, 0.5));
-  font-family: ui-monospace, Consolas, monospace;
-}
-
 .app-icon {
   width: 88px;
   height: 88px;
@@ -2788,10 +2772,4 @@ code {
 .share-brand-logo--ancient .share-brand-logo__frame {
   border-color: rgba(212, 168, 75, 0.65);
   background: linear-gradient(145deg, #1a0a0a, #0c0606);
-}
-
-.share-brand-logo--ancient .share-brand-logo__chip {
-  background: #8b1a1a;
-  color: #d4a84b;
-  box-shadow: 0 0 10px rgba(139, 26, 26, 0.5);
 }

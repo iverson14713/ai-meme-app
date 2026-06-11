@@ -60,7 +60,6 @@ export function ShareBrandLogo({ personalityId, muted = false }: ShareBrandLogoP
           <span className="share-brand-logo__eye share-brand-logo__eye--right" />
         </div>
       </div>
-      <span className="share-brand-logo__chip">AI</span>
     </div>
   )
 }
