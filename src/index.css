@@ -2512,35 +2512,256 @@ code {
   bottom: 0;
 }
 
-.share-card-imperial-seal {
+/* Personality stamp — 分享卡右下角蓋章 */
+
+.share-personality-stamp {
   position: absolute;
-  bottom: 72px;
-  right: 20px;
-  width: 52px;
-  height: 52px;
-  z-index: 2;
+  bottom: 12px;
+  right: 12px;
+  z-index: 4;
   pointer-events: none;
-  transform: rotate(-12deg);
-  opacity: 0.85;
+  transform-origin: center center;
+  opacity: 0.9;
 }
 
-.share-card-imperial-seal-inner {
+.share-personality-stamp__inner {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  border: 3px solid rgba(180, 40, 40, 0.85);
-  border-radius: 6px;
-  background: rgba(139, 26, 26, 0.35);
-  color: #d4a84b;
-  font-size: 26px;
+  gap: 2px;
+  min-width: 58px;
+  min-height: 58px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.share-personality-stamp__main {
+  display: block;
+  font-size: 11px;
   font-weight: 900;
-  font-family: serif, 'Songti TC', serif;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.share-personality-stamp__sub {
+  display: block;
+  font-size: 7px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  opacity: 0.92;
+}
+
+/* 普通 AI — 霓虹綠科技認證章 */
+
+.share-personality-stamp--normal .share-personality-stamp__inner {
+  border: 2px solid rgba(102, 255, 204, 0.85);
+  border-radius: 8px;
+  background: rgba(5, 12, 10, 0.72);
   box-shadow:
-    inset 0 0 12px rgba(0, 0, 0, 0.4),
-    0 0 16px rgba(180, 40, 40, 0.3);
-  text-shadow: 0 0 8px rgba(212, 168, 75, 0.4);
+    inset 0 0 10px rgba(102, 255, 204, 0.12),
+    0 0 14px rgba(102, 255, 204, 0.28);
+}
+
+.share-personality-stamp--normal .share-personality-stamp__main {
+  color: #66ffcc;
+  font-family: ui-monospace, Consolas, monospace;
+  text-shadow: 0 0 8px rgba(102, 255, 204, 0.45);
+}
+
+.share-personality-stamp--normal .share-personality-stamp__sub {
+  color: rgba(102, 255, 204, 0.75);
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+/* 地獄 AI — 紅色故障警告章 */
+
+.share-personality-stamp--hell .share-personality-stamp__inner {
+  border: 3px double rgba(255, 70, 70, 0.9);
+  border-radius: 4px;
+  background: rgba(40, 8, 8, 0.82);
+  box-shadow:
+    inset 0 0 12px rgba(255, 0, 0, 0.15),
+    0 0 16px rgba(255, 60, 60, 0.35);
+}
+
+.share-personality-stamp--hell .share-personality-stamp__main {
+  color: #ff5555;
+  font-family: ui-monospace, Consolas, monospace;
+  text-shadow:
+    1px 0 rgba(255, 0, 80, 0.6),
+    -1px 0 rgba(0, 255, 200, 0.35),
+    0 0 10px rgba(255, 50, 50, 0.5);
+}
+
+.share-personality-stamp--hell .share-personality-stamp__sub {
+  color: rgba(255, 120, 120, 0.9);
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+/* 地獄加辣 — 加辣警告章 */
+
+.share-personality-stamp--hellspicy .share-personality-stamp__inner {
+  border: 3px solid rgba(255, 68, 68, 0.95);
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(60, 10, 5, 0.9),
+      rgba(60, 10, 5, 0.9) 4px,
+      rgba(80, 15, 5, 0.9) 4px,
+      rgba(80, 15, 5, 0.9) 8px
+    );
+  box-shadow:
+    inset 0 0 10px rgba(255, 100, 0, 0.2),
+    0 0 18px rgba(255, 68, 68, 0.4);
+}
+
+.share-personality-stamp--hellspicy .share-personality-stamp__main {
+  color: #ff6644;
+  font-family: ui-monospace, Consolas, monospace;
+  text-shadow:
+    0 0 8px rgba(255, 100, 0, 0.6),
+    1px 1px 0 rgba(255, 0, 0, 0.4);
+}
+
+.share-personality-stamp--hellspicy .share-personality-stamp__sub {
+  color: #ffaa66;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+/* 社畜 AI — 黃黑核准章 */
+
+.share-personality-stamp--salaryman .share-personality-stamp__inner {
+  border: 3px solid #fbbf24;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(251, 191, 36, 0.18) 0,
+      rgba(251, 191, 36, 0.18) 3px,
+      rgba(10, 10, 10, 0.85) 3px,
+      rgba(10, 10, 10, 0.85) 6px
+    );
+  box-shadow:
+    inset 0 0 8px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(251, 191, 36, 0.25);
+  min-width: 64px;
+  min-height: 64px;
+  padding: 8px;
+}
+
+.share-personality-stamp--salaryman .share-personality-stamp__main {
+  color: #fbbf24;
+  font-size: 10px;
+  font-family: system-ui, sans-serif;
+}
+
+.share-personality-stamp--salaryman .share-personality-stamp__sub {
+  color: rgba(251, 191, 36, 0.8);
+  font-family: ui-monospace, Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+/* 佛系 AI — 白金色禪印 */
+
+.share-personality-stamp--zen .share-personality-stamp__inner {
+  border: 2px solid rgba(232, 228, 212, 0.75);
+  border-radius: 50%;
+  background: rgba(20, 18, 14, 0.78);
+  box-shadow:
+    inset 0 0 14px rgba(232, 228, 212, 0.08),
+    0 0 12px rgba(212, 168, 75, 0.15);
+  min-width: 62px;
+  min-height: 62px;
+  padding: 10px 6px;
+}
+
+.share-personality-stamp--zen .share-personality-stamp__main {
+  color: #e8e4d4;
+  font-size: 10px;
+  font-family: serif, 'Songti TC', serif;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 8px rgba(212, 168, 75, 0.25);
+}
+
+/* 情勒 AI — 粉紫情緒認證章 */
+
+.share-personality-stamp--guilt .share-personality-stamp__inner {
+  border: 2px solid rgba(192, 132, 252, 0.85);
+  border-radius: 10px;
+  background: rgba(28, 12, 38, 0.82);
+  box-shadow:
+    inset 0 0 12px rgba(192, 132, 252, 0.12),
+    0 0 14px rgba(192, 132, 252, 0.28);
+}
+
+.share-personality-stamp--guilt .share-personality-stamp__main {
+  color: #d8b4fe;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.share-personality-stamp--guilt .share-personality-stamp__sub {
+  color: rgba(216, 180, 254, 0.75);
+}
+
+/* 戀愛腦 AI — 粉紅暈船章 */
+
+.share-personality-stamp--lovebrain .share-personality-stamp__inner {
+  border: 2px solid rgba(255, 133, 179, 0.9);
+  border-radius: 50%;
+  background: rgba(40, 12, 28, 0.82);
+  box-shadow:
+    inset 0 0 10px rgba(255, 133, 179, 0.15),
+    0 0 16px rgba(255, 133, 179, 0.3);
+  min-width: 62px;
+  min-height: 62px;
+}
+
+.share-personality-stamp--lovebrain .share-personality-stamp__main {
+  color: #ff85b3;
+  font-size: 10px;
+}
+
+.share-personality-stamp--lovebrain .share-personality-stamp__sub {
+  color: #ff85b3;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+
+.share-personality-stamp--lovebrain .share-personality-stamp__sub::before {
+  content: '♥ ';
+}
+
+/* 古代 AI — 暗紅玉璽 */
+
+.share-personality-stamp--ancient .share-personality-stamp__inner {
+  border: 3px solid rgba(180, 40, 40, 0.9);
+  border-radius: 6px;
+  background: rgba(139, 26, 26, 0.42);
+  box-shadow:
+    inset 0 0 12px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(180, 40, 40, 0.28);
+  min-width: 56px;
+  min-height: 56px;
+}
+
+.share-personality-stamp--ancient .share-personality-stamp__main {
+  color: #d4a84b;
+  font-size: 14px;
+  font-family: serif, 'Songti TC', serif;
+  text-shadow: 0 0 8px rgba(212, 168, 75, 0.45);
+}
+
+.share-personality-stamp--ancient .share-personality-stamp__sub {
+  color: rgba(212, 168, 75, 0.85);
+  font-size: 9px;
+  font-family: serif, 'Songti TC', serif;
+  letter-spacing: 0.28em;
 }
 
 .share-card-decreet-preamble {

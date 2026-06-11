@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import type { PersonalityId } from '../personalities'
+import { getShareLogoDataUrl, SHARE_LOGO_URL } from '../share/shareLogo'
 
 type ShareBrandLogoProps = {
   personalityId: PersonalityId
@@ -6,6 +8,24 @@ type ShareBrandLogoProps = {
 }
 
 export function ShareBrandLogo({ personalityId, muted = false }: ShareBrandLogoProps) {
+  const [logoSrc, setLogoSrc] = useState(SHARE_LOGO_URL)
+
+  useEffect(() => {
+    let cancelled = false
+
+    getShareLogoDataUrl()
+      .then((dataUrl) => {
+        if (!cancelled) setLogoSrc(dataUrl)
+      })
+      .catch(() => {
+        if (!cancelled) setLogoSrc(SHARE_LOGO_URL)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <div
       className={`share-brand-logo share-brand-logo--${personalityId} ${muted ? 'share-brand-logo--muted' : ''}`}
@@ -27,7 +47,13 @@ export function ShareBrandLogo({ personalityId, muted = false }: ShareBrandLogoP
           <circle cx="18" cy="18" r="2" fill="currentColor" opacity="0.9" />
           <circle cx="54" cy="54" r="2" fill="currentColor" opacity="0.9" />
         </svg>
-        <img className="share-brand-logo__icon" src="/icon.png" alt="" />
+        <img
+          className="share-brand-logo__icon"
+          src={logoSrc}
+          alt=""
+          data-share-logo="true"
+          decoding="sync"
+        />
         <div className="share-brand-logo__scanline" aria-hidden="true" />
         <div className="share-brand-logo__eyes" aria-hidden="true">
           <span className="share-brand-logo__eye share-brand-logo__eye--left" />

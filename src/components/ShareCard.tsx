@@ -9,6 +9,7 @@ import {
 } from '../share/shareBrand'
 import type { AnalysisResult } from '../types/analysis'
 import { ShareBrandLogo } from './ShareBrandLogo'
+import { SharePersonalityStamp } from './SharePersonalityStamp'
 import { ShareRadar } from './ShareRadar'
 
 type ShareCardProps = {
@@ -48,13 +49,10 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
         {!isTruth && <div className="share-card-grid-bg" aria-hidden="true" />}
 
         {isAncient && (
-          <>
-            <div className="share-card-imperial-border" aria-hidden="true" />
-            <div className="share-card-imperial-seal" aria-hidden="true">
-              <span className="share-card-imperial-seal-inner">璽</span>
-            </div>
-          </>
+          <div className="share-card-imperial-border" aria-hidden="true" />
         )}
+
+        {!isTruth && <SharePersonalityStamp personalityId={personality.id} />}
 
         {variant === 'rare' || variant === 'ultra' ? (
           <div className="share-card-rare-stamp" aria-hidden="true">

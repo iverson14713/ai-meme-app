@@ -1,8 +1,11 @@
 import { toPng } from 'html-to-image'
+import { ensureShareImagesReady } from '../share/shareLogo'
 
 export async function generateShareImage(node: HTMLElement): Promise<string> {
+  await ensureShareImagesReady(node)
+
   return toPng(node, {
-    cacheBust: true,
+    cacheBust: false,
     pixelRatio: 3,
     backgroundColor: '#050508',
   })
