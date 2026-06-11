@@ -1,14 +1,10 @@
+import { getPrivacyPath, getTermsPath } from '../routing/legalPaths'
+
 type AppFooterProps = {
   onOpenSettings: () => void
-  onOpenPrivacy: () => void
-  onOpenTerms: () => void
 }
 
-export function AppFooter({
-  onOpenSettings,
-  onOpenPrivacy,
-  onOpenTerms,
-}: AppFooterProps) {
+export function AppFooter({ onOpenSettings }: AppFooterProps) {
   return (
     <footer className="app-footer">
       <button type="button" className="app-footer__link" onClick={onOpenSettings}>
@@ -17,15 +13,15 @@ export function AppFooter({
       <span className="app-footer__sep" aria-hidden="true">
         ·
       </span>
-      <button type="button" className="app-footer__link" onClick={onOpenPrivacy}>
+      <a className="app-footer__link" href={getPrivacyPath()}>
         Privacy Policy
-      </button>
+      </a>
       <span className="app-footer__sep" aria-hidden="true">
         ·
       </span>
-      <button type="button" className="app-footer__link" onClick={onOpenTerms}>
+      <a className="app-footer__link" href={getTermsPath()}>
         Terms of Service
-      </button>
+      </a>
     </footer>
   )
 }

@@ -1,26 +1,36 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 
 type LegalPageLayoutProps = {
   title: string
   subtitle: string
+  documentTitle: string
   children: ReactNode
-  onBack: () => void
+  backHref?: string
   footerNote?: string
 }
 
 export function LegalPageLayout({
   title,
   subtitle,
+  documentTitle,
   children,
-  onBack,
+  backHref = '/',
   footerNote,
 }: LegalPageLayoutProps) {
+  useEffect(() => {
+    const previousTitle = document.title
+    document.title = documentTitle
+    return () => {
+      document.title = previousTitle
+    }
+  }, [documentTitle])
+
   return (
     <div className="view fade-in legal-page">
       <div className="legal-page__card">
-        <button type="button" className="legal-page__back scale-button" onClick={onBack}>
+        <a href={backHref} className="legal-page__back scale-button">
           ← 返回
-        </button>
+        </a>
 
         <header className="legal-page__header">
           <p className="legal-page__kicker">AI有點嘴 · LEGAL</p>

@@ -1,15 +1,11 @@
 import { LegalPageLayout } from '../components/LegalPageLayout'
 
-type PrivacyPolicyPageProps = {
-  onBack: () => void
-}
-
-export function PrivacyPolicyPage({ onBack }: PrivacyPolicyPageProps) {
+export function PrivacyPolicyPage() {
   return (
     <LegalPageLayout
       title="Privacy Policy"
       subtitle="隱私權政策"
-      onBack={onBack}
+      documentTitle="隱私權政策 · AI有點嘴"
       footerNote="AI有點嘴不保證會改善你的人生，但可能讓你笑一下。"
     >
       <p className="legal-page__updated">最後更新：2026 年 6 月</p>

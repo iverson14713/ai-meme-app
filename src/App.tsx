@@ -23,9 +23,7 @@ import { TruthEventLoadingView } from './components/TruthEventLoadingView'
 import { UpgradeModal } from './components/UpgradeModal'
 import { SplashScreen } from './components/SplashScreen'
 import { AppFooter } from './components/AppFooter'
-import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import { SettingsPage } from './pages/SettingsPage'
-import { TermsOfServicePage } from './pages/TermsOfServicePage'
 import {
   buildCommonRareResult,
   buildTruthRareResult,
@@ -62,8 +60,6 @@ import { isOnboardingCompleted } from './onboarding/onboardingStorage'
 type Phase =
   | 'home'
   | 'settings'
-  | 'privacy'
-  | 'terms'
   | 'loading'
   | 'result'
   | 'rare-loading'
@@ -104,7 +100,6 @@ export default function App() {
   const [debugForceRare, setDebugForceRare] = useState<DebugForceRareTier | null>(
     null,
   )
-  const [legalBackTarget, setLegalBackTarget] = useState<'home' | 'settings'>('home')
   const [developerUnlockOpen, setDeveloperUnlockOpen] = useState(false)
   const [restoreMessage, setRestoreMessage] = useState('')
   const [upgradeRestoreMessage, setUpgradeRestoreMessage] = useState('')
@@ -205,20 +200,6 @@ export default function App() {
   }
 
   const openSettings = () => setPhase('settings')
-
-  const openPrivacy = (from: 'home' | 'settings' = 'home') => {
-    setLegalBackTarget(from)
-    setPhase('privacy')
-  }
-
-  const openTerms = (from: 'home' | 'settings' = 'home') => {
-    setLegalBackTarget(from)
-    setPhase('terms')
-  }
-
-  const handleLegalBack = () => {
-    setPhase(legalBackTarget)
-  }
 
   const beginRareFlow = (rareRoll: ActiveRareEvent) => {
     analysisSessionRef.current += 1
@@ -447,8 +428,6 @@ export default function App() {
           debugForceRare={debugForceRare}
           onArmRare={handleArmRare}
           onOpenSettings={openSettings}
-          onOpenPrivacy={() => openPrivacy('home')}
-          onOpenTerms={() => openTerms('home')}
           onSecretLogoTap={handleSecretLogoTap}
         />
       )}
@@ -458,14 +437,10 @@ export default function App() {
           restoring={subscription.restoring}
           restoreMessage={restoreMessage}
           onBack={() => setPhase('home')}
-          onOpenPrivacy={() => openPrivacy('settings')}
-          onOpenTerms={() => openTerms('settings')}
           onRestorePurchases={handleRestorePurchases}
           onSecretLogoTap={handleSecretLogoTap}
         />
       )}
-      {phase === 'privacy' && <PrivacyPolicyPage onBack={handleLegalBack} />}
-      {phase === 'terms' && <TermsOfServicePage onBack={handleLegalBack} />}
       {phase === 'loading' && (
         <LoadingView
           personality={personality}
@@ -519,8 +494,6 @@ function HomeView({
   debugForceRare,
   onArmRare,
   onOpenSettings,
-  onOpenPrivacy,
-  onOpenTerms,
   onSecretLogoTap,
 }: {
   question: string
@@ -534,8 +507,6 @@ function HomeView({
   debugForceRare: DebugForceRareTier | null
   onArmRare: (tier: DebugForceRareTier) => void
   onOpenSettings: () => void
-  onOpenPrivacy: () => void
-  onOpenTerms: () => void
   onSecretLogoTap: () => void
 }) {
   const onLogoTap = useSecretLogoTap(onSecretLogoTap)
@@ -652,11 +623,7 @@ function HomeView({
         </div>
       )}
 
-      <AppFooter
-        onOpenSettings={onOpenSettings}
-        onOpenPrivacy={onOpenPrivacy}
-        onOpenTerms={onOpenTerms}
-      />
+      <AppFooter onOpenSettings={onOpenSettings} />
     </div>
   )
 }

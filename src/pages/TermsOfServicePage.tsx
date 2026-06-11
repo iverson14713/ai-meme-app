@@ -1,15 +1,11 @@
 import { LegalPageLayout } from '../components/LegalPageLayout'
 
-type TermsOfServicePageProps = {
-  onBack: () => void
-}
-
-export function TermsOfServicePage({ onBack }: TermsOfServicePageProps) {
+export function TermsOfServicePage() {
   return (
     <LegalPageLayout
       title="Terms of Service"
       subtitle="服務條款"
-      onBack={onBack}
+      documentTitle="服務條款 · AI有點嘴"
       footerNote="AI有點嘴不保證會改善你的人生，但可能讓你笑一下。"
     >
       <p className="legal-page__updated">最後更新：2026 年 6 月</p>

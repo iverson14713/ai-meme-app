@@ -5,6 +5,7 @@ import {
   RESTORE_SUCCESS_MESSAGE,
 } from '../iap/restoreFeedback'
 import { isIapAvailable } from '../iap/subscriptionService'
+import { getPrivacyPath, getTermsPath } from '../routing/legalPaths'
 import type { UsageSnapshot } from '../usage/planLimits'
 
 type SettingsPageProps = {
@@ -12,8 +13,6 @@ type SettingsPageProps = {
   restoring: boolean
   restoreMessage: string
   onBack: () => void
-  onOpenPrivacy: () => void
-  onOpenTerms: () => void
   onRestorePurchases: () => void
   onSecretLogoTap: () => void
 }
@@ -23,8 +22,6 @@ export function SettingsPage({
   restoring,
   restoreMessage,
   onBack,
-  onOpenPrivacy,
-  onOpenTerms,
   onRestorePurchases,
   onSecretLogoTap,
 }: SettingsPageProps) {
@@ -90,14 +87,14 @@ export function SettingsPage({
         <section className="settings-section">
           <h2 className="settings-section__title">法律與政策</h2>
           <div className="settings-link-list">
-            <button type="button" className="settings-link-item scale-button" onClick={onOpenPrivacy}>
+            <a className="settings-link-item scale-button" href={getPrivacyPath()}>
               <span className="settings-link-item__label">Privacy Policy</span>
               <span className="settings-link-item__hint">隱私權政策</span>
-            </button>
-            <button type="button" className="settings-link-item scale-button" onClick={onOpenTerms}>
+            </a>
+            <a className="settings-link-item scale-button" href={getTermsPath()}>
               <span className="settings-link-item__label">Terms of Service</span>
               <span className="settings-link-item__hint">服務條款</span>
-            </button>
+            </a>
           </div>
         </section>
 
