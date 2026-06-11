@@ -20,6 +20,7 @@ import { RareEventLoadingView } from './components/RareEventLoadingView'
 import { RareEventResultView } from './components/RareEventResultView'
 import { TruthEventLoadingView } from './components/TruthEventLoadingView'
 import { UpgradeModal } from './components/UpgradeModal'
+import { SplashScreen } from './components/SplashScreen'
 import {
   buildCommonRareResult,
   buildTruthRareResult,
@@ -39,6 +40,7 @@ import {
   toggleProMode,
   type UsageSnapshot,
 } from './usage/planLimits'
+import { pickSplashDurationMs, pickSplashMessage } from './splash/splashMessages'
 
 type Phase =
   | 'home'
@@ -49,6 +51,9 @@ type Phase =
   | 'rare-result'
 
 export default function App() {
+  const [splashDone, setSplashDone] = useState(false)
+  const [splashMessage] = useState(() => pickSplashMessage())
+  const [splashDurationMs] = useState(() => pickSplashDurationMs())
   const [phase, setPhase] = useState<Phase>('home')
   const [question, setQuestion] = useState('')
   const [personalityId, setPersonalityId] = useState<PersonalityId>('normal')
@@ -81,6 +86,12 @@ export default function App() {
   useEffect(() => {
     setUsage(loadUsageSnapshot())
   }, [])
+
+  useEffect(() => {
+    if (splashDone) return
+    const timer = window.setTimeout(() => setSplashDone(true), splashDurationMs)
+    return () => window.clearTimeout(timer)
+  }, [splashDone, splashDurationMs])
 
   const openUpgrade = (variant: 'limit' | 'personality') => {
     setUpgradeVariant(variant)
@@ -291,6 +302,10 @@ export default function App() {
       : phase === 'rare-loading' && activeRare?.tier === 'truth'
         ? 'app-shell theme-truth'
         : `app-shell theme-${personalityId}`
+
+  if (!splashDone) {
+    return <SplashScreen message={splashMessage} />
+  }
 
   return (
     <div className={shellClass}>
