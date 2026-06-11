@@ -33,7 +33,11 @@ import {
   rollRareEvent,
 } from './rareEvents/rareEvents'
 import type { ActiveRareEvent, DebugForceRareTier } from './rareEvents/types'
-import { downloadShareImage, generateShareImage } from './utils/shareImage'
+import {
+  generateShareImage,
+  getShareImageButtonLabel,
+  shareOrDownloadImage,
+} from './utils/shareImage'
 import { SHARE_LOGO_URL } from './share/shareLogo'
 import { DeveloperUnlockModal } from './components/DeveloperUnlockModal'
 import { isDeveloperUnlocked } from './dev/developerMode'
@@ -691,7 +695,9 @@ function ResultView({
   const shareCardRef = useRef<HTMLDivElement>(null)
   const [shareImageUrl, setShareImageUrl] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isDelivering, setIsDelivering] = useState(false)
   const [shareError, setShareError] = useState('')
+  const shareImageButtonLabel = getShareImageButtonLabel()
 
   const handleGenerateShare = async () => {
     if (!shareCardRef.current) return
@@ -707,9 +713,19 @@ function ResultView({
     }
   }
 
-  const handleDownloadShare = () => {
+  const handleDeliverShare = async () => {
     if (!shareImageUrl) return
-    downloadShareImage(shareImageUrl)
+    setIsDelivering(true)
+    setShareError('')
+    try {
+      await shareOrDownloadImage(shareImageUrl)
+    } catch (error) {
+      setShareError(
+        error instanceof Error ? error.message : `${shareImageButtonLabel}失敗，請再試一次`,
+      )
+    } finally {
+      setIsDelivering(false)
+    }
   }
 
   return (
@@ -743,10 +759,10 @@ function ResultView({
         </button>
         <button
           className="download-button scale-button"
-          onClick={handleDownloadShare}
-          disabled={!shareImageUrl}
+          onClick={handleDeliverShare}
+          disabled={!shareImageUrl || isDelivering}
         >
-          下載圖片
+          {isDelivering ? '處理中...' : shareImageButtonLabel}
         </button>
         <button className="retry-button-subtle scale-button" onClick={onRetry}>
           再問一次
