@@ -44,3 +44,8 @@ export function pickDisclaimer(personalityId: PersonalityId): string {
   const pool = getPersonalityDefinition(personalityId).disclaimers
   return pool[Math.floor(Math.random() * pool.length)]
 }
+
+export function pickQuestionPlaceholder(personalityId: PersonalityId): string {
+  const pool = getPersonalityDefinition(personalityId).placeholders
+  return pool[Math.floor(Math.random() * pool.length)]
+}

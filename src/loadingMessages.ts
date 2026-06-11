@@ -4,6 +4,7 @@ export const LOADING_MESSAGE_INTERVAL_MS = 1000
 
 export {
   pickLoadingMessages,
+  pickQuestionPlaceholder,
   getPersonality,
   PERSONALITIES,
   type PersonalityId,

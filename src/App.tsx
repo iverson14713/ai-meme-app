@@ -6,6 +6,7 @@ import {
   PERSONALITIES,
   getPersonality,
   pickLoadingMessages,
+  pickQuestionPlaceholder,
   type PersonalityId,
 } from './loadingMessages'
 import { pickResult } from './results'
@@ -64,6 +65,9 @@ export default function App() {
   const [phase, setPhase] = useState<Phase>('home')
   const [question, setQuestion] = useState('')
   const [personalityId, setPersonalityId] = useState<PersonalityId>('normal')
+  const [questionPlaceholder, setQuestionPlaceholder] = useState(() =>
+    pickQuestionPlaceholder('normal'),
+  )
   const [progress, setProgress] = useState(0)
   const [loadingMessages, setLoadingMessages] = useState<string[]>([])
   const [messageIndex, setMessageIndex] = useState(0)
@@ -100,6 +104,11 @@ export default function App() {
     const timer = window.setTimeout(() => setSplashDone(true), splashDurationMs)
     return () => window.clearTimeout(timer)
   }, [splashDone, splashDurationMs])
+
+  useEffect(() => {
+    if (phase !== 'home' || !splashDone) return
+    setQuestionPlaceholder(pickQuestionPlaceholder(personalityId))
+  }, [phase, splashDone, personalityId])
 
   const openUpgrade = (variant: 'limit' | 'personality') => {
     setUpgradeVariant(variant)
@@ -343,6 +352,7 @@ export default function App() {
         <HomeView
           question={question}
           personalityId={personalityId}
+          questionPlaceholder={questionPlaceholder}
           usage={usage}
           onQuestionChange={setQuestion}
           onPersonalityChange={handlePersonalityChange}
@@ -410,6 +420,7 @@ export default function App() {
 function HomeView({
   question,
   personalityId,
+  questionPlaceholder,
   usage,
   onQuestionChange,
   onPersonalityChange,
@@ -423,6 +434,7 @@ function HomeView({
 }: {
   question: string
   personalityId: PersonalityId
+  questionPlaceholder: string
   usage: UsageSnapshot
   onQuestionChange: (value: string) => void
   onPersonalityChange: (id: PersonalityId) => void
@@ -477,7 +489,7 @@ function HomeView({
 
       <input
         className="question-input"
-        placeholder="我要不要離職？"
+        placeholder={questionPlaceholder}
         value={question}
         onChange={(e) => onQuestionChange(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && onStart()}
