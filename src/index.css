@@ -834,6 +834,56 @@ code {
   font-size: 15px;
 }
 
+.home-stat-line {
+  min-height: 1.4em;
+  margin-bottom: 30px;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 0 10px var(--neon-soft);
+  animation: home-stat-fade-in 0.55s ease-out;
+}
+
+.home-stat-line--ultra {
+  color: #fde68a;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 12px rgba(251, 191, 36, 0.45),
+    0 0 24px rgba(255, 215, 128, 0.2);
+  animation: home-stat-ultra-in 0.65s ease-out;
+}
+
+@keyframes home-stat-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(2px);
+  }
+
+  100% {
+    opacity: 0.85;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes home-stat-ultra-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.01);
+  }
+
+  100% {
+    opacity: 0.95;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .question-input {
   width: 100%;
   max-width: 320px;

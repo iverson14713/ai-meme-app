@@ -46,6 +46,7 @@ import {
   type UsageSnapshot,
 } from './usage/planLimits'
 import { pickSplashDurationMs, pickSplashMessage } from './splash/splashMessages'
+import { HomeStatRotator } from './components/HomeStatRotator'
 import { Onboarding } from './components/Onboarding'
 import { isOnboardingCompleted } from './onboarding/onboardingStorage'
 
@@ -459,7 +460,7 @@ function HomeView({
     <div className="view fade-in">
       <img className="app-icon" src={SHARE_LOGO_URL} alt="AI有點嘴" data-share-logo="true" />
       <h1 className="glow-title">AI 有點嘴</h1>
-      <p className="subtitle">已分析 1,234,567 個失敗人生</p>
+      <HomeStatRotator />
 
       <div className="usage-bar">
         <span className={`usage-plan-badge ${usage.isPro ? 'usage-plan-badge--pro' : ''}`}>
