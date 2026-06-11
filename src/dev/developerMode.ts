@@ -2,7 +2,7 @@ const STORAGE_DEVELOPER = 'developer_unlocked'
 
 /** SHA-256 of developer passphrase — plaintext is not stored in source */
 const DEVELOPER_CODE_HASH =
-  'f6dc372b41b9ed6ebb7651f7276e2821836606753f697700b57a958b5068f388'
+  '18b1ec0a148082433bb4900587197a0c3bc0d1c427e9048c31f9b24a1a0871c0'
 
 export const DEVELOPER_DAILY_LIMIT = 999_999
 
