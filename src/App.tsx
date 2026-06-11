@@ -37,11 +37,15 @@ import {
 import type { ActiveRareEvent, DebugForceRareTier } from './rareEvents/types'
 import { downloadShareImage, generateShareImage } from './utils/shareImage'
 import { SHARE_LOGO_URL } from './share/shareLogo'
+import { DeveloperUnlockModal } from './components/DeveloperUnlockModal'
+import { isDeveloperUnlocked } from './dev/developerMode'
+import { useSecretLogoTap } from './dev/useSecretLogoTap'
 import {
   consumeUsage,
   isPersonalityUnlocked,
   loadUsageSnapshot,
   setProMode,
+  shouldShowUpgrade,
   toggleProMode,
   type UsageSnapshot,
 } from './usage/planLimits'
@@ -96,8 +100,19 @@ export default function App() {
     null,
   )
   const [legalBackTarget, setLegalBackTarget] = useState<'home' | 'settings'>('home')
+  const [developerUnlockOpen, setDeveloperUnlockOpen] = useState(false)
 
   const personality = getPersonality(personalityId)
+
+  const handleSecretLogoTap = useCallback(() => {
+    if (!isDeveloperUnlocked()) {
+      setDeveloperUnlockOpen(true)
+    }
+  }, [])
+
+  const handleDeveloperUnlocked = useCallback(() => {
+    setUsage(loadUsageSnapshot())
+  }, [])
 
   useEffect(() => {
     setUsage(loadUsageSnapshot())
@@ -115,6 +130,7 @@ export default function App() {
   }, [phase, splashDone, personalityId])
 
   const openUpgrade = (variant: 'limit' | 'personality') => {
+    if (!shouldShowUpgrade()) return
     setUpgradeVariant(variant)
     setUpgradeOpen(true)
   }
@@ -350,11 +366,18 @@ export default function App() {
 
   return (
     <div className={shellClass}>
-      <UpgradeModal
-        open={upgradeOpen}
-        variant={upgradeVariant}
-        onClose={() => setUpgradeOpen(false)}
-        onUpgrade={handleFakeUpgrade}
+      {shouldShowUpgrade() && (
+        <UpgradeModal
+          open={upgradeOpen}
+          variant={upgradeVariant}
+          onClose={() => setUpgradeOpen(false)}
+          onUpgrade={handleFakeUpgrade}
+        />
+      )}
+      <DeveloperUnlockModal
+        open={developerUnlockOpen}
+        onClose={() => setDeveloperUnlockOpen(false)}
+        onUnlocked={handleDeveloperUnlocked}
       />
       {phase === 'home' && (
         <HomeView
@@ -371,6 +394,7 @@ export default function App() {
           onOpenSettings={openSettings}
           onOpenPrivacy={() => openPrivacy('home')}
           onOpenTerms={() => openTerms('home')}
+          onSecretLogoTap={handleSecretLogoTap}
         />
       )}
       {phase === 'settings' && (
@@ -379,7 +403,7 @@ export default function App() {
           onBack={() => setPhase('home')}
           onOpenPrivacy={() => openPrivacy('settings')}
           onOpenTerms={() => openTerms('settings')}
-          onTogglePro={handleTogglePro}
+          onSecretLogoTap={handleSecretLogoTap}
         />
       )}
       {phase === 'privacy' && <PrivacyPolicyPage onBack={handleLegalBack} />}
@@ -439,6 +463,7 @@ function HomeView({
   onOpenSettings,
   onOpenPrivacy,
   onOpenTerms,
+  onSecretLogoTap,
 }: {
   question: string
   personalityId: PersonalityId
@@ -453,21 +478,39 @@ function HomeView({
   onOpenSettings: () => void
   onOpenPrivacy: () => void
   onOpenTerms: () => void
+  onSecretLogoTap: () => void
 }) {
-  const planLabel = usage.isPro ? 'PRO' : 'Free'
+  const onLogoTap = useSecretLogoTap(onSecretLogoTap)
+  const planLabel = usage.isDeveloper ? 'DEV' : usage.isPro ? 'PRO' : 'Free'
 
   return (
     <div className="view fade-in">
-      <img className="app-icon" src={SHARE_LOGO_URL} alt="AI有點嘴" data-share-logo="true" />
+      <img
+        className="app-icon app-icon--secret-tap"
+        src={SHARE_LOGO_URL}
+        alt="AI有點嘴"
+        data-share-logo="true"
+        onClick={onLogoTap}
+      />
       <h1 className="glow-title">AI 有點嘴</h1>
       <HomeStatRotator />
 
       <div className="usage-bar">
-        <span className={`usage-plan-badge ${usage.isPro ? 'usage-plan-badge--pro' : ''}`}>
+        <span
+          className={`usage-plan-badge ${usage.isDeveloper || usage.isPro ? 'usage-plan-badge--pro' : ''} ${usage.isDeveloper ? 'usage-plan-badge--dev' : ''}`}
+        >
           {planLabel}
         </span>
         <span className="usage-remaining">
-          今日剩餘：<strong>{usage.remaining}</strong> / {usage.dailyLimit}
+          {usage.isDeveloper ? (
+            <>
+              今日剩餘：<strong>∞</strong>
+            </>
+          ) : (
+            <>
+              今日剩餘：<strong>{usage.remaining}</strong> / {usage.dailyLimit}
+            </>
+          )}
         </span>
       </div>
 
@@ -511,43 +554,45 @@ function HomeView({
         開始量子分析
       </button>
 
-      <div className="debug-panel">
-        <p className="debug-panel-label">DEBUG</p>
-        <button type="button" className="debug-pro-toggle" onClick={onTogglePro}>
-          切換 PRO 模式
-        </button>
-        <button
-          type="button"
-          className={`debug-pro-toggle ${debugForceRare === 'common' ? 'debug-pro-toggle--active' : ''}`}
-          onClick={() => onArmRare('common')}
-        >
-          {debugForceRare === 'common' ? '✓ 下次：強制稀有事件' : '強制稀有事件'}
-        </button>
-        <button
-          type="button"
-          className={`debug-pro-toggle ${debugForceRare === 'ultra' ? 'debug-pro-toggle--active' : ''}`}
-          onClick={() => onArmRare('ultra')}
-        >
-          {debugForceRare === 'ultra' ? '✓ 下次：強制 AI 崩潰' : '強制 AI 崩潰'}
-        </button>
-        <button
-          type="button"
-          className={`debug-pro-toggle ${debugForceRare === 'truth' ? 'debug-pro-toggle--active' : ''}`}
-          onClick={() => onArmRare('truth')}
-        >
-          {debugForceRare === 'truth' ? '✓ 下次：強制超真實' : '強制超真實事件'}
-        </button>
-        {debugForceRare && (
-          <p className="debug-armed-hint">
-            已武裝：下次「開始量子分析」將觸發
-            {debugForceRare === 'ultra'
-              ? ' AI 崩潰'
-              : debugForceRare === 'truth'
-                ? ' 超真實暴擊'
-                : ' 稀有事件'}
-          </p>
-        )}
-      </div>
+      {import.meta.env.DEV && (
+        <div className="debug-panel">
+          <p className="debug-panel-label">DEBUG</p>
+          <button type="button" className="debug-pro-toggle" onClick={onTogglePro}>
+            切換 PRO 模式
+          </button>
+          <button
+            type="button"
+            className={`debug-pro-toggle ${debugForceRare === 'common' ? 'debug-pro-toggle--active' : ''}`}
+            onClick={() => onArmRare('common')}
+          >
+            {debugForceRare === 'common' ? '✓ 下次：強制稀有事件' : '強制稀有事件'}
+          </button>
+          <button
+            type="button"
+            className={`debug-pro-toggle ${debugForceRare === 'ultra' ? 'debug-pro-toggle--active' : ''}`}
+            onClick={() => onArmRare('ultra')}
+          >
+            {debugForceRare === 'ultra' ? '✓ 下次：強制 AI 崩潰' : '強制 AI 崩潰'}
+          </button>
+          <button
+            type="button"
+            className={`debug-pro-toggle ${debugForceRare === 'truth' ? 'debug-pro-toggle--active' : ''}`}
+            onClick={() => onArmRare('truth')}
+          >
+            {debugForceRare === 'truth' ? '✓ 下次：強制超真實' : '強制超真實事件'}
+          </button>
+          {debugForceRare && (
+            <p className="debug-armed-hint">
+              已武裝：下次「開始量子分析」將觸發
+              {debugForceRare === 'ultra'
+                ? ' AI 崩潰'
+                : debugForceRare === 'truth'
+                  ? ' 超真實暴擊'
+                  : ' 稀有事件'}
+            </p>
+          )}
+        </div>
+      )}
 
       <AppFooter
         onOpenSettings={onOpenSettings}

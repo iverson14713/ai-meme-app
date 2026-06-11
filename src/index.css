@@ -1084,6 +1084,114 @@ code {
   line-height: 1.4;
 }
 
+.app-icon--secret-tap {
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.usage-plan-badge--dev {
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: #c4b5fd;
+}
+
+.settings-page__logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 0 12px;
+  border-radius: 12px;
+}
+
+.dev-unlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(4, 6, 12, 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.dev-unlock-card {
+  width: 100%;
+  max-width: 340px;
+  padding: 22px 20px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(167, 139, 250, 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(17, 24, 39, 0.96) 0%, rgba(8, 10, 18, 0.98) 100%);
+  box-shadow: 0 0 32px rgba(167, 139, 250, 0.12);
+  text-align: center;
+}
+
+.dev-unlock-kicker {
+  margin: 0 0 8px;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: rgba(167, 139, 250, 0.65);
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.dev-unlock-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #ddd6fe;
+  text-shadow: 0 0 14px rgba(167, 139, 250, 0.35);
+}
+
+.dev-unlock-hint {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dev-unlock-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  outline: none;
+}
+
+.dev-unlock-input:focus {
+  border-color: rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.15);
+}
+
+.dev-unlock-error {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #f87171;
+}
+
+.dev-unlock-submit {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.dev-unlock-cancel {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dev-unlock-cancel:hover {
+  color: rgba(255, 255, 255, 0.65);
+}
+
 /* App footer */
 
 .app-footer {

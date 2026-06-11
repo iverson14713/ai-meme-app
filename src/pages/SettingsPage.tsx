@@ -1,3 +1,5 @@
+import { SHARE_LOGO_URL } from '../share/shareLogo'
+import { useSecretLogoTap } from '../dev/useSecretLogoTap'
 import type { UsageSnapshot } from '../usage/planLimits'
 
 type SettingsPageProps = {
@@ -5,7 +7,7 @@ type SettingsPageProps = {
   onBack: () => void
   onOpenPrivacy: () => void
   onOpenTerms: () => void
-  onTogglePro: () => void
+  onSecretLogoTap: () => void
 }
 
 export function SettingsPage({
@@ -13,9 +15,10 @@ export function SettingsPage({
   onBack,
   onOpenPrivacy,
   onOpenTerms,
-  onTogglePro,
+  onSecretLogoTap,
 }: SettingsPageProps) {
-  const planLabel = usage.isPro ? 'PRO' : 'Free'
+  const onLogoTap = useSecretLogoTap(onSecretLogoTap)
+  const planLabel = usage.isDeveloper ? 'DEV' : usage.isPro ? 'PRO' : 'Free'
 
   return (
     <div className="view fade-in settings-page">
@@ -25,6 +28,13 @@ export function SettingsPage({
         </button>
 
         <header className="settings-page__header">
+          <img
+            className="settings-page__logo app-icon--secret-tap"
+            src={SHARE_LOGO_URL}
+            alt=""
+            aria-hidden="true"
+            onClick={onLogoTap}
+          />
           <p className="legal-page__kicker">AI有點嘴 · SETTINGS</p>
           <h1 className="legal-page__title">設定</h1>
           <p className="legal-page__subtitle">方案、條款與隱私</p>
@@ -33,16 +43,17 @@ export function SettingsPage({
         <section className="settings-section">
           <h2 className="settings-section__title">使用方案</h2>
           <div className="settings-plan-row">
-            <span className={`usage-plan-badge ${usage.isPro ? 'usage-plan-badge--pro' : ''}`}>
+            <span
+              className={`usage-plan-badge ${usage.isDeveloper || usage.isPro ? 'usage-plan-badge--pro' : ''} ${usage.isDeveloper ? 'usage-plan-badge--dev' : ''}`}
+            >
               {planLabel}
             </span>
             <span className="settings-plan-detail">
-              今日剩餘 {usage.remaining} / {usage.dailyLimit} 次
+              {usage.isDeveloper
+                ? '開發者模式 · 無限次數'
+                : `今日剩餘 ${usage.remaining} / ${usage.dailyLimit} 次`}
             </span>
           </div>
-          <button type="button" className="debug-pro-toggle settings-pro-toggle" onClick={onTogglePro}>
-            切換 PRO 模式（測試）
-          </button>
         </section>
 
         <section className="settings-section">
