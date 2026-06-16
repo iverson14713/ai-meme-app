@@ -7,7 +7,7 @@ export type ProProductId = (typeof PRO_PRODUCT_IDS)[number]
 
 export const PRO_FALLBACK_PRICES = {
   monthly: 'NT$30/月',
-  yearly: 'NT$199/年',
+  yearly: 'NT$290/年',
 } as const
 
 export const PRO_PLAN_LABELS = {

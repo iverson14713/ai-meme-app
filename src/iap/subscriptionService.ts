@@ -6,6 +6,7 @@ import {
   PRO_PRODUCT_YEARLY,
   type ProProductId,
 } from './constants'
+import { formatProPriceForDisplay } from './formatProPrice'
 import { isNativeApp } from '../platform/runtime'
 
 export type ProPlan = 'monthly' | 'yearly'
@@ -63,8 +64,11 @@ export async function fetchProductPrices(): Promise<ProductPriceInfo> {
     const yearly = products.find((p) => p.identifier === PRO_PRODUCT_YEARLY)
 
     return {
-      monthly: monthly?.priceString ?? PRO_FALLBACK_PRICES.monthly,
-      yearly: yearly?.priceString ?? PRO_FALLBACK_PRICES.yearly,
+      monthly: formatProPriceForDisplay(
+        monthly?.priceString,
+        'monthly',
+      ),
+      yearly: formatProPriceForDisplay(yearly?.priceString, 'yearly'),
     }
   } catch (error) {
     console.warn('[IAP] Failed to load product prices:', error)

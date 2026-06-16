@@ -125,6 +125,10 @@ export function UpgradeModal({
           <p className="upgrade-web-note">{WEB_UPGRADE_NOTE}</p>
         )}
 
+        {iapAvailable && (
+          <p className="upgrade-pricing-note">以下價格皆以新台幣（NT$）計價</p>
+        )}
+
         {purchasing && <p className="upgrade-status">正在處理購買...</p>}
         {restoring && <p className="upgrade-status">正在恢復購買...</p>}
         {feedbackMessage && (
@@ -141,6 +145,12 @@ export function UpgradeModal({
             }
           >
             {errorMessage}
+          </p>
+        )}
+
+        {iapAvailable && (
+          <p className="upgrade-restore-note">
+            訂閱將透過 App Store 扣款，可隨時於 App Store 管理或取消。價格以新台幣（NT$）顯示。
           </p>
         )}
 

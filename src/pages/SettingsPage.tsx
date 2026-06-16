@@ -4,12 +4,13 @@ import {
   RESTORE_NOT_FOUND_MESSAGE,
   RESTORE_SUCCESS_MESSAGE,
 } from '../iap/restoreFeedback'
-import { isIapAvailable } from '../iap/subscriptionService'
+import { isIapAvailable, type ProductPriceInfo } from '../iap/subscriptionService'
 import { getPrivacyPath, getTermsPath } from '../routing/legalPaths'
 import type { UsageSnapshot } from '../usage/planLimits'
 
 type SettingsPageProps = {
   usage: UsageSnapshot
+  prices: ProductPriceInfo
   restoring: boolean
   restoreMessage: string
   onBack: () => void
@@ -19,6 +20,7 @@ type SettingsPageProps = {
 
 export function SettingsPage({
   usage,
+  prices,
   restoring,
   restoreMessage,
   onBack,
@@ -65,6 +67,11 @@ export function SettingsPage({
                   : `Free · 今日剩餘 ${usage.remaining} / ${usage.dailyLimit} 次`}
             </span>
           </div>
+          {iapAvailable && (
+            <p className="settings-subscription-note">
+              PRO 訂閱（新台幣）：月費 {prices.monthly} · 年費 {prices.yearly}
+            </p>
+          )}
           {iapAvailable && (
             <button
               type="button"

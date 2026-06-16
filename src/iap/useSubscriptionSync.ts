@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { PRO_FALLBACK_PRICES } from './constants'
 import {
   PURCHASE_CANCELLED_MESSAGE,
   PURCHASE_SUCCESS_MESSAGE,
@@ -39,8 +40,7 @@ export function useSubscriptionSync(
 ): SubscriptionSyncState {
   const [iapReady, setIapReady] = useState(false)
   const [prices, setPrices] = useState<ProductPriceInfo>(() => ({
-    monthly: 'NT$30/月',
-    yearly: 'NT$199/年',
+    ...PRO_FALLBACK_PRICES,
   }))
   const [purchasing, setPurchasing] = useState(false)
   const [restoring, setRestoring] = useState(false)

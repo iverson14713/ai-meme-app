@@ -438,6 +438,7 @@ export default function App() {
       {phase === 'settings' && (
         <SettingsPage
           usage={usage}
+          prices={subscription.prices}
           restoring={subscription.restoring}
           restoreMessage={restoreMessage}
           onBack={() => setPhase('home')}
